@@ -201,6 +201,11 @@ def gif2mp4(gif, mp4):
         '-y',  # 强制覆盖
         mp4
     ]
+    ffmpeg_command = [
+        'convert',
+        gif,
+        mp4
+    ]
     subprocess.run(ffmpeg_command)
   
     
@@ -221,6 +226,9 @@ def proc_media(media_filename, face_filename, out_file_path, is_enhancement, ref
     duration = clip.duration
 
     outTime = duration * 30
+
+    if media_filename.lower().endswith(('.jpg')):
+        outTime = 200
 
     if outTime > 3600:
         outTime = 3600
