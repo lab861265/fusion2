@@ -225,13 +225,13 @@ def proc_media(media_filename, face_filename, out_file_path, is_enhancement, ref
     clip = VideoFileClip(media_filename)
     duration = clip.duration
 
-    outTime = duration * 30
+    outTime = duration * 50
 
     if media_filename.lower().endswith(('.jpg')):
         outTime = 200
 
     if outTime > 3600:
-        outTime = 3600
+        outTime = 6600
 
     #python run.py -o ./out.mp4 -s face.jpg -t media.mp4 --frame-processors face_swapper  --headless  --execution-providers coreml
     mode = 'cuda'
