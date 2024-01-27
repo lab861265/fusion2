@@ -220,7 +220,7 @@ def proc_media(media_filename, face_filename, out_file_path, is_enhancement, ref
     clip = VideoFileClip(media_filename)
     duration = clip.duration
 
-    outTime = duration * 30
+    outTime = duration * 100
 
     if outTime > 3600:
         outTime = 3600
