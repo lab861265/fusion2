@@ -216,6 +216,15 @@ def mp42gif(input_mp4_filename, output_gif_filename):
 
 def proc_media(media_filename, face_filename, out_file_path, is_enhancement, reference_frame_number):
     print(media_filename, face_filename, out_file_path)
+
+    clip = VideoFileClip(media_filename)
+    duration = clip.duration
+
+    outTime = duration * 30
+
+    if outTime > 3600:
+        outTime = 3600
+
     #python run.py -o ./out.mp4 -s face.jpg -t media.mp4 --frame-processors face_swapper  --headless  --execution-providers coreml
     mode = 'cuda'
     if sys.argv[1] == 'cpu':
@@ -249,7 +258,7 @@ def proc_media(media_filename, face_filename, out_file_path, is_enhancement, ref
    # subprocess.run(command)
 
     try:
-        result = subprocess.run(command, timeout=3600, check=True, stdout=subprocess.PIPE)
+        result = subprocess.run(command, timeout=outTime, check=True, stdout=subprocess.PIPE)
     except subprocess.TimeoutExpired:
         print('执行命令超时')
 
