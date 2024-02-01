@@ -288,7 +288,7 @@ def work():
     if sys.argv[1] == 'cpu':
         mode = 'cpu'
     term = 'cuda'
-    if sys.argv[2] != '':
+    if sys.argv[2]:
         term = sys.argv[2]
     data = callApi("workerGetTask", {'mode':mode, 'term':term})
     print(data)
