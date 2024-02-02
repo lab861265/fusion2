@@ -44,7 +44,7 @@ def convert_to_720p(input_path):
     needPro = 0
     if resolution[0] >= 1280 and resolution[1] >= 720:
         ffmpeg_command.append('-vf')
-        ffmpeg_command.append('scale=trunc(iw/2)*2:trunc(ih/2)*2')
+        ffmpeg_command.append('scale=trunc(iw/4)*2:trunc(ih/4)*2')
         needPro = 1
     if fps > 25:
         ffmpeg_command.append('-r')
