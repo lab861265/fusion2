@@ -334,8 +334,10 @@ def work():
         
     if media_filename.lower().endswith(('.mp4', '.m4v', '.mkv', '.avi', '.mov', '.webm', '.mpeg', '.mpg', '.wmv', '.flv', '.asf', '.3gp', '.3g2', '.ogg', '.vob', '.rmvb', '.ts', '.m2ts', '.divx', '.xvid', '.h264', '.avc', '.hevc', '.vp9', '.avchd')):
         
-        convert_to_720p(media_filename)
-
+        try:
+    	    convert_to_720p(media_filename)
+        except Exception as e:
+            	
         media_filename = 'media.mp4'
         
         out_file_path = 'media_out.mp4'
