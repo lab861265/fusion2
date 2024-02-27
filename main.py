@@ -222,17 +222,18 @@ def mp42gif(input_mp4_filename, output_gif_filename):
 def proc_media(media_filename, face_filename, out_file_path, is_enhancement, reference_frame_number):
     print(media_filename, face_filename, out_file_path)
 
-    clip = VideoFileClip(media_filename)
-    duration = clip.duration
+    #clip = VideoFileClip(media_filename)
+    #duration = clip.duration
 
-    outTime = duration * 50
+    #outTime = duration * 50
 
-    if media_filename.lower().endswith(('.jpg')):
-        outTime = 200
+    #if media_filename.lower().endswith(('.jpg')):
+    #    outTime = 200
 
-    if outTime > 3600:
-        outTime = 6600
+    #if outTime > 3600:
+    #    outTime = 6600
 
+    outTime = 6600
     #python run.py -o ./out.mp4 -s face.jpg -t media.mp4 --frame-processors face_swapper  --headless  --execution-providers coreml
     mode = 'cuda'
     if sys.argv[1] == 'cpu':
