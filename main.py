@@ -337,7 +337,7 @@ def work():
         try:
     	    convert_to_720p(media_filename)
         except Exception as e:
-            	
+            print(e)
         media_filename = 'media.mp4'
         
         out_file_path = 'media_out.mp4'
