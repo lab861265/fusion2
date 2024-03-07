@@ -219,21 +219,21 @@ def mp42gif(input_mp4_filename, output_gif_filename):
     ]
     subprocess.run(ffmpeg_command)
 
-def proc_media(media_filename, face_filename, out_file_path, is_enhancement, reference_frame_number):
+def proc_media(media_filename, face_filename, out_file_path, is_enhancement, need_credit):
     print(media_filename, face_filename, out_file_path)
 
     #clip = VideoFileClip(media_filename)
     #duration = clip.duration
 
-    #outTime = duration * 50
+    outTime = need_credit * 20
 
     #if media_filename.lower().endswith(('.jpg')):
     #    outTime = 200
 
-    #if outTime > 3600:
-    #    outTime = 6600
+    if outTime > 3600:
+        outTime = 6600
 
-    outTime = 6600
+
     #python run.py -o ./out.mp4 -s face.jpg -t media.mp4 --frame-processors face_swapper  --headless  --execution-providers coreml
     mode = 'cuda'
     if sys.argv[1] == 'cpu':
@@ -328,9 +328,10 @@ def work():
     extName = os.path.splitext(media_file_url)[1].lower()
 
     is_enhancement = int(taskData.get('is_enhancement', 0))
+    need_credit = int(taskData.get('need_credit', 0))
     reference_frame_number = str(taskData.get('reference_frame_number', 0))
 
-    print('is_enhancement, reference_frame_number', is_enhancement, reference_frame_number);
+    print('is_enhancement, need_credit', is_enhancement, need_credit);
         
     if media_filename.lower().endswith(('.mp4', '.m4v', '.mkv', '.avi', '.mov', '.webm', '.mpeg', '.mpg', '.wmv', '.flv', '.asf', '.3gp', '.3g2', '.ogg', '.vob', '.rmvb', '.ts', '.m2ts', '.divx', '.xvid', '.h264', '.avc', '.hevc', '.vp9', '.avchd')):
         
@@ -341,7 +342,7 @@ def work():
         media_filename = 'media.mp4'
         
         out_file_path = 'media_out.mp4'
-        proc_media(media_filename, face_filename, out_file_path, is_enhancement, reference_frame_number)
+        proc_media(media_filename, face_filename, out_file_path, is_enhancement, need_credit)
         thumb_file_path = 'thumb_media.jpg'
         generate_video_thumbnail(out_file_path, thumb_file_path)
         if not os.path.exists(out_file_path):
@@ -361,7 +362,7 @@ def work():
         out_file_path = 'media_out.mp4'
         print('文件后缀：', extName)
         gif2mp4('media.gif', 'media.mp4')
-        proc_media('media.mp4', face_filename, out_file_path, is_enhancement,reference_frame_number)
+        proc_media('media.mp4', face_filename, out_file_path, is_enhancement,need_credit)
         thumb_file_path = 'thumb_media.jpg'
         generate_video_thumbnail(out_file_path, thumb_file_path)
         mp42gif('media_out.mp4', 'media_out.gif')
@@ -381,7 +382,7 @@ def work():
     if media_filename.lower().endswith(('.jpg')):
         out_file_path = 'media_out.jpg'
         real_out_file_path = 'media_out.jpg'
-        proc_media(media_filename, face_filename, out_file_path, 1,reference_frame_number)
+        proc_media(media_filename, face_filename, out_file_path, 1,need_credit)
 
         if not os.path.exists(out_file_path):
             print(f"找不到文件 {out_file_path}")
