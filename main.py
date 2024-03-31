@@ -21,7 +21,7 @@ import signal
 import shutil
 
 
-def convert_to_720p(input_path):
+def convert_to_720p(input_path, need_credit):
     clip = VideoFileClip(input_path)
     resolution = clip.size
     fps = clip.fps
@@ -42,7 +42,7 @@ def convert_to_720p(input_path):
         '-i', renamed_path
     ]
     needPro = 0
-    if resolution[0] >= 1920:
+    if resolution[0] >= 1920 or need_credit >= 1000:
         ffmpeg_command.append('-vf')
         ffmpeg_command.append('scale=trunc(iw/4)*2:trunc(ih/4)*2')
         needPro = 1
@@ -336,7 +336,7 @@ def work():
     if media_filename.lower().endswith(('.mp4', '.m4v', '.mkv', '.avi', '.mov', '.webm', '.mpeg', '.mpg', '.wmv', '.flv', '.asf', '.3gp', '.3g2', '.ogg', '.vob', '.rmvb', '.ts', '.m2ts', '.divx', '.xvid', '.h264', '.avc', '.hevc', '.vp9', '.avchd')):
         
         try:
-    	    convert_to_720p(media_filename)
+    	    convert_to_720p(media_filename, need_credit)
         except Exception as e:
             print(e)
         media_filename = 'media.mp4'
