@@ -335,6 +335,10 @@ def work():
 
     is_enhancement = int(taskData.get('is_enhancement', 0))
     need_credit = int(taskData.get('need_credit', 0))
+
+    start_time = int(taskData.get('start_time', 0))
+    end_time = int(taskData.get('end_time', 0))
+
     reference_frame_number = str(taskData.get('reference_frame_number', 0))
 
     print('is_enhancement, need_credit', is_enhancement, need_credit);
@@ -342,7 +346,7 @@ def work():
     if media_filename.lower().endswith(('.mp4', '.m4v', '.mkv', '.avi', '.mov', '.webm', '.mpeg', '.mpg', '.wmv', '.flv', '.asf', '.3gp', '.3g2', '.ogg', '.vob', '.rmvb', '.ts', '.m2ts', '.divx', '.xvid', '.h264', '.avc', '.hevc', '.vp9', '.avchd')):
         
         try:
-    	    convert_to_720p(media_filename, need_credit)
+    	    convert_to_720p(media_filename, need_credit, start_time, end_time)
         except Exception as e:
             print(e)
         media_filename = 'media.mp4'
