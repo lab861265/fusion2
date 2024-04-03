@@ -21,7 +21,7 @@ import signal
 import shutil
 
 
-def convert_to_720p(input_path, need_credit):
+def convert_to_720p(input_path, need_credit, start_time=0, end_time=0):
     clip = VideoFileClip(input_path)
     resolution = clip.size
     fps = clip.fps
@@ -41,7 +41,12 @@ def convert_to_720p(input_path, need_credit):
         '-y', 
         '-i', renamed_path
     ]
-    needPro = 0
+    needPro = 1
+
+    if start_time != 0 or end_time != 0:
+        ffmpeg_command.extend(['-ss', str(start_time)])
+        ffmpeg_command.extend(['-to', str(end_time)])
+
     if resolution[0] >= 1920 or need_credit >= 1000:
         ffmpeg_command.append('-vf')
         ffmpeg_command.append('scale=trunc(iw/4)*2:trunc(ih/4)*2')
