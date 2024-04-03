@@ -41,9 +41,10 @@ def convert_to_720p(input_path, need_credit, start_time=0, end_time=0):
         '-y', 
         '-i', renamed_path
     ]
-    needPro = 1
+    needPro = 0
 
     if start_time != 0 or end_time != 0:
+        needPro = 1
         ffmpeg_command.extend(['-ss', str(start_time)])
         ffmpeg_command.extend(['-to', str(end_time)])
 
