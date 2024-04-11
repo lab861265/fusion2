@@ -83,13 +83,13 @@ def convert_to_720p(input_path, need_credit, start_time=0, end_time=0):
 def calculate_md5(input_string):
     md5_hash = hashlib.md5(input_string.encode()).hexdigest()
     return md5_hash
-def upload_file(url, file_path, ext = ""):
+def upload_file(url, file_path, ext):
     chunk_size = 1024 * 1024 * 2  # 1MB
     total_chunks = -(-os.path.getsize(file_path) // chunk_size)  # 總分片數，無條件取整
     current_chunk = 0
     data = {'name': '', 'link': ''}
     fileSize = os.path.getsize(file_path)
-    upFileName = str(time.time()) + str(fileSize) + file_path + ext
+    upFileName = str(time.time()) + str(fileSize) + file_path + str(ext)
     with open(file_path, 'rb') as f:
         while current_chunk < total_chunks:
             start = current_chunk * chunk_size
@@ -339,7 +339,7 @@ def work():
     start_time = int(taskData.get('start_time', 0))
     end_time = int(taskData.get('end_time', 0))
 
-    part = str(taskData.get('part', 0))
+    part = taskData.get('part', '')
 
     reference_frame_number = str(taskData.get('reference_frame_number', 0))
 
@@ -383,7 +383,7 @@ def work():
             print(f"找不到文件 {out_file_path}")
             addLog(1, -1, 'Processing failed', 99)
             return
-        upload_video_res = upload_file('https://fakeface.io/upload.php?m=media', out_file_path)
+        upload_video_res = upload_file('https://fakeface.io/upload.php?m=media', out_file_path, "")
         upload_image_res = upload_image('https://fakeface.io/upload.php?m=thumb', thumb_file_path)
         print('Upload result:', upload_video_res, upload_image_res)
         now = datetime.now()
