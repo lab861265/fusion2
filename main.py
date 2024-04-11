@@ -361,7 +361,7 @@ def work():
             print(f"找不到文件 {out_file_path}")
             addLog(1, -1, 'Processing failed', 99)
             return
-        upload_video_res = upload_file('https://fakeface.io/upload.php?m=media', out_file_path)
+        upload_video_res = upload_file('https://fakeface.io/upload.php?m=media', out_file_path, part)
         upload_image_res = upload_image('https://fakeface.io/upload.php?m=thumb', thumb_file_path)
         print('Upload result:', upload_video_res, upload_image_res)
         now = datetime.now()
@@ -383,7 +383,7 @@ def work():
             print(f"找不到文件 {out_file_path}")
             addLog(1, -1, 'Processing failed', 99)
             return
-        upload_video_res = upload_file('https://fakeface.io/upload.php?m=media', out_file_path, part)
+        upload_video_res = upload_file('https://fakeface.io/upload.php?m=media', out_file_path)
         upload_image_res = upload_image('https://fakeface.io/upload.php?m=thumb', thumb_file_path)
         print('Upload result:', upload_video_res, upload_image_res)
         now = datetime.now()
