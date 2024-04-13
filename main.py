@@ -89,7 +89,7 @@ def upload_file(url, file_path, ext):
     current_chunk = 0
     data = {'name': '', 'link': ''}
     fileSize = os.path.getsize(file_path)
-    upFileName = str(time.time()) + str(fileSize) + file_path + str(ext)
+    upFileName = str(time.time()) + str(fileSize) + str(ext) + file_path
     with open(file_path, 'rb') as f:
         while current_chunk < total_chunks:
             start = current_chunk * chunk_size
