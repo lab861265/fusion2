@@ -391,7 +391,7 @@ def work():
         print('Api result:', api_res)
         addLog(1, 3, 'finish', 100)
         return
-    if media_filename.lower().endswith(('.jpg')):
+    if media_filename.lower().endswith(('.jpg')) or media_filename.lower().endswith(('.webp')):
         out_file_path = 'media_out.jpg'
         real_out_file_path = 'media_out.jpg'
         proc_media(media_filename, face_filename, out_file_path, 1,need_credit)
