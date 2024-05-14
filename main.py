@@ -231,7 +231,7 @@ def proc_media(media_filename, face_filename, out_file_path, is_enhancement, nee
     #clip = VideoFileClip(media_filename)
     #duration = clip.duration
 
-    outTime = need_credit * 25
+    outTime = need_credit * 30
 
     #if media_filename.lower().endswith(('.jpg')):
     #    outTime = 200
