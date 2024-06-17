@@ -48,7 +48,7 @@ def convert_to_720p(input_path, need_credit, start_time=0, end_time=0):
         ffmpeg_command.extend(['-ss', str(start_time)])
         ffmpeg_command.extend(['-to', str(end_time)])
 
-    if resolution[0] >= 1920 or need_credit >= 1000:
+    if resolution[0] >= 1920 and need_credit >= 1000:
         ffmpeg_command.append('-vf')
         ffmpeg_command.append('scale=trunc(iw/4)*2:trunc(ih/4)*2')
         needPro = 1
