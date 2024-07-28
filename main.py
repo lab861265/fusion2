@@ -522,7 +522,6 @@ def work():
             print(f"找不到文件 {out_file_path}")
             addLog(1, -1, 'Processing failed', 99)
             return
-        addLog(0, 2, 'finish quickly', 99)
         upload_file_url = upload_file(out_file_path)
         upload_image_url = upload_file(thumb_file_path)
         now = datetime.now()
