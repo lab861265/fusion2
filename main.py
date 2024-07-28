@@ -171,6 +171,28 @@ def upload_image(upload_url, image_path):
     except Exception as e:
         print('Error:', str(e))
 
+def generate_img_thumbnail(image_path, thumbnail_path, max_size=512):
+    # 读取图片
+    image = cv2.imread(image_path)
+    
+    if image is None:
+        raise ValueError(f"Unable to read image from {image_path}")
+
+    # 获取图片的宽和高
+    height, width, _ = image.shape
+
+    # 调整缩略图的大小
+    if width > max_size or height > max_size:
+        if width > height:
+            new_width = max_size
+            new_height = int(height * (max_size / width))
+        else:
+            new_height = max_size
+            new_width = int(width * (max_size / height))
+        image = cv2.resize(image, (new_width, new_height))
+    
+    # 保存缩略图
+    cv2.imwrite(thumbnail_path, image)
 
 def generate_video_thumbnail(video_path, thumbnail_path, max_size=512):
     cap = cv2.VideoCapture(video_path)
@@ -505,7 +527,6 @@ def work():
         upload_image_url = upload_file(thumb_file_path)
         now = datetime.now()
 
-        print('Upload result:', upload_res)
         api_res = callApi("wokerAddMedia", {'user_id':data['data']['user_id'], 'media_id':data['data']['finish_media_id'], 'file_url':upload_file_url, 'thumb_url':upload_image_url, 'file_hash':now.strftime("%Y-%m-%d %H:%M:%S") })
         print('Api result:', api_res)
         addLog(1, 3, 'finish', 100)
