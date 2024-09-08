@@ -391,6 +391,7 @@ def proc_media(media_filename, face_filename, out_file_path, is_enhancement, nee
         result = subprocess.run(command, timeout=outTime, check=True, stdout=subprocess.PIPE)
     except subprocess.TimeoutExpired:
         print('执行命令超时')
+        sys.exit(0)
 
     return
     
