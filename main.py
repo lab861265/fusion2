@@ -24,6 +24,9 @@ import http.client
 from urllib.parse import urlparse
 from tqdm import tqdm
 
+from PIL import Image
+import imageio
+
 def convert_to_720p(input_path, need_credit, start_time=0, end_time=0):
     clip = VideoFileClip(input_path)
     resolution = clip.size
@@ -283,14 +286,10 @@ def gif2mp4(gif, mp4):
     ffmpeg_command = [
         'ffmpeg',
         '-i', gif,
-        '-c:v', 'libx264',  # 使用H.264编码器
-        '-pix_fmt', 'yuv420p',  # 设置像素格式，通常需要
-        '-y',  # 强制覆盖
-        mp4
-    ]
-    ffmpeg_command = [
-        'convert',
-        gif,
+        '-vf', 'scale=trunc(iw/2)*2:trunc(ih/2)*2',
+        '-movflags', 'faststart',
+        '-pix_fmt', 'yuv420p',
+        '-y',
         mp4
     ]
     subprocess.run(ffmpeg_command)
@@ -331,14 +330,25 @@ def add_border(input_image_path, output_image_path):
 
     
 def mp42gif(input_mp4_filename, output_gif_filename):
-    ffmpeg_command = [
+    palette_file = 'palette.png'
+    ffmpeg_palette_command = [
         'ffmpeg',
-        '-y',  # 强制覆盖
+        '-y',
         '-i', input_mp4_filename,
-   #     '-vf', 'fps=10,scale=320:-1:flags=lanczos',  # 设置帧速率和尺寸等参数
+        '-vf', 'fps=15,scale=500:-1:flags=lanczos,palettegen',  # 设置帧率和生成调色板
+        palette_file
+    ]
+    subprocess.run(ffmpeg_palette_command)
+    ffmpeg_gif_command = [
+        'ffmpeg',
+        '-y',
+        '-i', input_mp4_filename,
+        '-i', palette_file,
+        '-lavfi', 'fps=10 [x]; [x][1:v] paletteuse',
         output_gif_filename
     ]
-    subprocess.run(ffmpeg_command)
+    subprocess.run(ffmpeg_gif_command)
+
 
 def proc_media(media_filename, face_filename, out_file_path, is_enhancement, need_credit):
     print(media_filename, face_filename, out_file_path)
