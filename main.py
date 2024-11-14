@@ -24,8 +24,8 @@ import http.client
 from urllib.parse import urlparse
 from tqdm import tqdm
 
-from PIL import Image
-import imageio
+#from PIL import Image
+#import imageio
 
 def convert_to_720p(input_path, need_credit, start_time=0, end_time=0):
     clip = VideoFileClip(input_path)
