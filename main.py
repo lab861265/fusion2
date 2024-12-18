@@ -520,6 +520,15 @@ def work():
 
     part = taskData.get('part', '')
 
+    nsfw = int(taskData.get('nsfw', 0))
+    if nsfw == 1:
+        open("nsfw", "w").close()
+
+    if os.path.exists("nsfw"):
+        print("文件 'nsfw' 存在。")
+    else:
+        print("文件 'nsfw' 不存在。")
+
     reference_frame_number = str(taskData.get('reference_frame_number', 0))
 
     print('is_enhancement, need_credit', is_enhancement, need_credit);
