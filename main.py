@@ -27,68 +27,120 @@ from tqdm import tqdm
 #from PIL import Image
 #import imageio
 
+
 def convert_to_720p(input_path, need_credit, start_time=0, end_time=0):
     clip = VideoFileClip(input_path)
-    resolution = clip.size
+    resolution = clip.size  # (width, height)
     fps = clip.fps
-    
+
     # 生成重命名后的文件名
     file_name, file_extension = os.path.splitext(os.path.basename(input_path))
     renamed_path = os.path.join(os.path.dirname(input_path), f"src_{file_name}{file_extension}")
 
     # 备份原始文件
-    #os.rename(input_path, renamed_path)
     shutil.copy(input_path, renamed_path)
 
-    # 转换并保存为新文件（使用重新编码而非快速拷贝）
-    output_path = os.path.join(os.path.dirname(renamed_path), f"{file_name}.mp4")
-    ffmpeg_command = [
-        'ffmpeg',
-        '-y', 
-        '-i', renamed_path
-    ]
-    needPro = 0
+    # 输出文件路径保持与输入文件名一致
+    output_path = input_path
 
-    if start_time != 0 or end_time != 0:
-        needPro = 1
-        ffmpeg_command.extend(['-ss', str(start_time)])
-        ffmpeg_command.extend(['-to', str(end_time)])
+    # 构建 FFmpeg 命令
+    ffmpeg_command = ['ffmpeg', '-y', '-i', renamed_path]
 
-    if resolution[0] >= 1920 and need_credit >= 300:
-        ffmpeg_command.append('-vf')
-        ffmpeg_command.append('scale=trunc(iw/4)*2:trunc(ih/4)*2')
-        needPro = 1
-    if resolution[1] >= 1920 and need_credit >= 300:
-        ffmpeg_command.append('-vf')
-        ffmpeg_command.append('scale=trunc(iw/4)*2:trunc(ih/4)*2')
-        needPro = 1
+    # 视频裁剪（可选）
+    if start_time > 0 or end_time > 0:
+        ffmpeg_command.extend(['-ss', str(start_time), '-to', str(end_time)])
+
+    # 判断分辨率并设置缩放
+    if resolution[1] > 720:  # 仅在高度大于720时缩放
+        drawtext_filter = (
+            f"scale=trunc(iw*720/ih/2)*2:720,"
+            f"drawtext=text='AI generated':"
+            f"x=w-tw-20:y=h-th-20:fontsize=h*0.03:"
+            f"fontcolor=white@0.3:shadowx=2:shadowy=2:shadowcolor=black@0.3"
+        )
+        ffmpeg_command.extend(['-vf', drawtext_filter])
+    else:  # 不缩放，仅添加水印
+        drawtext_filter = (
+            f"drawtext=text='AI generated':"
+            f"x=w-tw-20:y=h-th-20:fontsize=h*0.03:"
+            f"fontcolor=white@0.3:shadowx=2:shadowy=2:shadowcolor=black@0.3"
+        )
+        ffmpeg_command.extend(['-vf', drawtext_filter])
+
+    # 降低帧率（如必要）
     if fps > 25:
-        ffmpeg_command.append('-r')
-        ffmpeg_command.append('25')
-        needPro = 1
-    if os.path.splitext(input_path)[1].lower() != '.mp4':
-        needPro = 1
+        ffmpeg_command.extend(['-r', '25'])
 
-		#if: clip.duration > 120:
-        
-		#else:
-		#	ffmpeg_command.append('-vf')
-       # 	ffmpeg_command.append('scale=-1:720')
-		#ffmpeg_command.append('-c:a')
-        #ffmpeg_command.append('copy')
-    #    needPro = 1
+    # 音频处理
+    ffmpeg_command.extend(['-c:a', 'aac', '-b:a', '128k'])
+
+    # 设置输出路径
     ffmpeg_command.append(output_path)
 
-    needPro = 1
-    if needPro:
-        print(ffmpeg_command)
-        #os.remove(output_path)
-        subprocess.run(ffmpeg_command)
-        print(f"Video successfully converted. Saved at {output_path}")
-    else:
-        print(f"No need converted")
-        
+    # 执行 FFmpeg 命令
+    print("FFmpeg Command: ", ' '.join(ffmpeg_command))
+    subprocess.run(ffmpeg_command, check=True)
+    print(f"视频成功转换并保存为: {output_path}")
 
+    # 释放资源
+    clip.close()
+
+
+def add_watermark_to_mp4(input_path):
+
+    # 生成重命名后的文件名
+    file_name, file_extension = os.path.splitext(os.path.basename(input_path))
+    renamed_path = os.path.join(os.path.dirname(input_path), f"src1_{file_name}{file_extension}")
+
+    # 备份原始文件
+    shutil.copy(input_path, renamed_path)
+
+    # 输出文件路径保持与输入文件名一致
+    output_path = input_path
+
+    # 构建 FFmpeg 命令
+    ffmpeg_command = ['ffmpeg', '-y', '-i', renamed_path]
+
+    drawtext_filter = (
+        f"drawtext=text='AI generated':"
+        f"x=w-tw-20:y=h-th-20:fontsize=h*0.03:"
+        f"fontcolor=white@0.3:shadowx=2:shadowy=2:shadowcolor=black@0.3"
+    )
+    ffmpeg_command.extend(['-vf', drawtext_filter])
+
+    # 设置输出路径
+    ffmpeg_command.append(output_path)
+
+    # 执行 FFmpeg 命令
+    print("FFmpeg Command: ", ' '.join(ffmpeg_command))
+    subprocess.run(ffmpeg_command, check=True)
+    print(f"水印: {output_path}")
+
+
+def add_watermark_to_image(input_path):
+    """
+    使用 FFmpeg 给图片添加水印
+    """
+    # 生成重命名后的文件名
+    file_name, file_extension = os.path.splitext(os.path.basename(input_path))
+    output_path = os.path.join(os.path.dirname(input_path), f"{file_name}{file_extension}")
+
+    # 构建 FFmpeg 命令
+    ffmpeg_command = [
+        "ffmpeg", "-y", "-i", input_path,
+        "-vf",
+        f"drawtext=text='AI generated':"
+        f"x=w-tw-20:y=h-th-20:fontsize=24:"
+        f"fontcolor=white@0.3:shadowx=2:shadowy=2:shadowcolor=black@0.3",
+        output_path
+    ]
+
+    # 执行命令
+    try:
+        subprocess.run(ffmpeg_command, check=True)
+        print(f"图片已添加水印，保存为: {output_path}")
+    except subprocess.CalledProcessError as e:
+        print(f"添加水印失败: {e}")
 
 
 def calculate_md5(input_string):
