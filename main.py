@@ -481,7 +481,8 @@ def work():
     #    sys.exit(0)
         return
     try:
-        delete_files(['face.png','media.gif','media.png','media.mp4','media_out.gif','media_out.mp4','media_out.jpg'])
+        delete_files(['nsfw', 'face.png','media.gif','media.png','media.mp4','media_out.gif','media_out.mp4','media_out.jpg'])
+        print(f"temp have been removed.")
         print(f"temp have been removed.")
     except Exception as e:
         print(f"Error deleting directory: {e}")
