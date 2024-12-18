@@ -27,7 +27,6 @@ from tqdm import tqdm
 #from PIL import Image
 #import imageio
 
-
 def convert_to_720p(input_path, need_credit, start_time=0, end_time=0):
     clip = VideoFileClip(input_path)
     resolution = clip.size  # (width, height)
@@ -141,7 +140,6 @@ def add_watermark_to_image(input_path):
         print(f"图片已添加水印，保存为: {output_path}")
     except subprocess.CalledProcessError as e:
         print(f"添加水印失败: {e}")
-
 
 def calculate_md5(input_string):
     md5_hash = hashlib.md5(input_string.encode()).hexdigest()
@@ -483,7 +481,6 @@ def work():
     try:
         delete_files(['nsfw', 'face.png','media.gif','media.png','media.mp4','media_out.gif','media_out.mp4','media_out.jpg'])
         print(f"temp have been removed.")
-        print(f"temp have been removed.")
     except Exception as e:
         print(f"Error deleting directory: {e}")
 
@@ -518,8 +515,6 @@ def work():
     start_time = int(taskData.get('start_time', 0))
     end_time = int(taskData.get('end_time', 0))
 
-    part = taskData.get('part', '')
-
     nsfw = int(taskData.get('nsfw', 0))
     if nsfw == 1:
         open("nsfw", "w").close()
@@ -529,9 +524,13 @@ def work():
     else:
         print("文件 'nsfw' 不存在。")
 
+    part = taskData.get('part', '')
+
     reference_frame_number = str(taskData.get('reference_frame_number', 0))
 
     print('is_enhancement, need_credit', is_enhancement, need_credit);
+
+    
         
     if media_filename.lower().endswith(('.mp4', '.m4v', '.mkv', '.avi', '.mov', '.webm', '.mpeg', '.mpg', '.wmv', '.flv', '.asf', '.3gp', '.3g2', '.ogg', '.vob', '.rmvb', '.ts', '.m2ts', '.divx', '.xvid', '.h264', '.avc', '.hevc', '.vp9', '.avchd')):
         
@@ -562,6 +561,7 @@ def work():
         out_file_path = 'media_out.mp4'
         print('文件后缀：', extName)
         gif2mp4('media.gif', 'media.mp4')
+        add_watermark_to_mp4('media.mp4');
         proc_media('media.mp4', face_filename, out_file_path, is_enhancement,need_credit)
         thumb_file_path = 'thumb_media.jpg'
         generate_video_thumbnail(out_file_path, thumb_file_path)
@@ -582,6 +582,7 @@ def work():
     if media_filename.lower().endswith(('.jpg')) or media_filename.lower().endswith(('.webp')):
         out_file_path = 'media_out.jpg'
         real_out_file_path = 'media_out.jpg'
+        add_watermark_to_image(media_filename);
         proc_media(media_filename, face_filename, out_file_path, 1,need_credit)
         thumb_file_path = 'thumb_media.jpg'
         generate_img_thumbnail(out_file_path, thumb_file_path)
@@ -589,6 +590,7 @@ def work():
             print(f"找不到文件 {out_file_path}")
             addLog(1, -1, 'Processing failed', 99)
             return
+        
         upload_file_url = upload_file(out_file_path)
         upload_image_url = upload_file(thumb_file_path)
         now = datetime.now()
