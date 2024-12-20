@@ -50,9 +50,9 @@ def convert_to_720p(input_path, need_credit, start_time=0, end_time=0):
         ffmpeg_command.extend(['-ss', str(start_time), '-to', str(end_time)])
 
     # 判断分辨率并设置缩放
-    if resolution[1] > 720:  # 仅在高度大于720时缩放
+    if resolution[1] > 1080:  # 仅在高度大于720时缩放
         drawtext_filter = (
-            f"scale=trunc(iw*720/ih/2)*2:720,"
+            f"scale=trunc(iw*1080/ih/2)*2:1080,"
             f"drawtext=text='AI generated':"
             f"x=w-tw-20:y=h-th-20:fontsize=h*0.03:"
             f"fontcolor=white@0.3:shadowx=2:shadowy=2:shadowcolor=black@0.3"
