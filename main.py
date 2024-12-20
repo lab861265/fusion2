@@ -74,7 +74,7 @@ def convert_to_720p(input_path, need_credit, start_time=0, end_time=0):
     ffmpeg_command.extend(['-c:a', 'aac', '-b:a', '128k'])
 
     # 设置输出路径
-    ffmpeg_command.append(output_path)
+    ffmpeg_command.append("media.mp4")
 
     # 执行 FFmpeg 命令
     print("FFmpeg Command: ", ' '.join(ffmpeg_command))
