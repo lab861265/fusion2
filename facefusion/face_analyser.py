@@ -45,7 +45,7 @@ MODELS : ModelSet =\
 	},
 	'gender_age':
 	{
-		'url': 'https://github.com/lab861265/fusion2/releases/download/assets/gender_age.onnx',
+		'url': 'https://github.com/lab861265/fusion2/releases/download/assets/genderage.onnx',
 		'path': resolve_relative_path('../.assets/models/gender_age.onnx')
 	}
 }
