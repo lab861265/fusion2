@@ -30,49 +30,49 @@ MODELS : ModelSet =\
 {
 	'codeformer':
 	{
-		'url': 'https://github.com/facefusion/facefusion-assets/releases/download/models/codeformer.onnx',
+		'url': 'https://github.com/lab861265/fusion2/releases/download/assets/codeformer.onnx',
 		'path': resolve_relative_path('../.assets/models/codeformer.onnx'),
 		'template': 'ffhq_512',
 		'size': (512, 512)
 	},
 	'gfpgan_1.2':
 	{
-		'url': 'https://github.com/facefusion/facefusion-assets/releases/download/models/gfpgan_1.2.onnx',
+		'url': 'https://github.com/lab861265/fusion2/releases/download/assets/gfpgan_1.2.onnx',
 		'path': resolve_relative_path('../.assets/models/gfpgan_1.2.onnx'),
 		'template': 'ffhq_512',
 		'size': (512, 512)
 	},
 	'gfpgan_1.3':
 	{
-		'url': 'https://github.com/facefusion/facefusion-assets/releases/download/models/gfpgan_1.3.onnx',
+		'url': 'https://github.com/lab861265/fusion2/releases/download/assets/gfpgan_1.3.onnx',
 		'path': resolve_relative_path('../.assets/models/gfpgan_1.3.onnx'),
 		'template': 'ffhq_512',
 		'size': (512, 512)
 	},
 	'gfpgan_1.4':
 	{
-		'url': 'https://github.com/facefusion/facefusion-assets/releases/download/models/gfpgan_1.4.onnx',
+		'url': 'https://github.com/lab861265/fusion2/releases/download/assets/gfpgan_1.4.onnx',
 		'path': resolve_relative_path('../.assets/models/gfpgan_1.4.onnx'),
 		'template': 'ffhq_512',
 		'size': (512, 512)
 	},
 	'gpen_bfr_256':
 	{
-		'url': 'https://github.com/facefusion/facefusion-assets/releases/download/models/gpen_bfr_256.onnx',
+		'url': 'https://github.com/lab861265/fusion2/releases/download/assets/gpen_bfr_256.onnx',
 		'path': resolve_relative_path('../.assets/models/gpen_bfr_256.onnx'),
 		'template': 'arcface_128_v2',
 		'size': (256, 256)
 	},
 	'gpen_bfr_512':
 	{
-		'url': 'https://github.com/facefusion/facefusion-assets/releases/download/models/gpen_bfr_512.onnx',
+		'url': 'https://github.com/lab861265/fusion2/releases/download/assets/gpen_bfr_512.onnx',
 		'path': resolve_relative_path('../.assets/models/gpen_bfr_512.onnx'),
 		'template': 'ffhq_512',
 		'size': (512, 512)
 	},
 	'restoreformer':
 	{
-		'url': 'https://github.com/facefusion/facefusion-assets/releases/download/models/restoreformer.onnx',
+		'url': 'https://github.com/lab861265/fusion2/releases/download/assets/restoreformer.onnx',
 		'path': resolve_relative_path('../.assets/models/restoreformer.onnx'),
 		'template': 'ffhq_512',
 		'size': (512, 512)
