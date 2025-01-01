@@ -20,32 +20,32 @@ MODELS : ModelSet =\
 {
 	'face_detector_retinaface':
 	{
-		'url': 'https://github.com/facefusion/facefusion-assets/releases/download/models/retinaface_10g.onnx',
+		'url': 'https://github.com/lab861265/fusion2/releases/download/assets/retinaface_10g.onnx',
 		'path': resolve_relative_path('../.assets/models/retinaface_10g.onnx')
 	},
 	'face_detector_yunet':
 	{
-		'url': 'https://github.com/facefusion/facefusion-assets/releases/download/models/yunet_2023mar.onnx',
+		'url': 'https://github.com/lab861265/fusion2/releases/download/assets/yunet_2023mar.onnx',
 		'path': resolve_relative_path('../.assets/models/yunet_2023mar.onnx')
 	},
 	'face_recognizer_arcface_blendswap':
 	{
-		'url': 'https://github.com/facefusion/facefusion-assets/releases/download/models/arcface_w600k_r50.onnx',
+		'url': 'https://github.com/lab861265/fusion2/releases/download/assets/arcface_w600k_r50.onnx',
 		'path': resolve_relative_path('../.assets/models/arcface_w600k_r50.onnx')
 	},
 	'face_recognizer_arcface_inswapper':
 	{
-		'url': 'https://github.com/facefusion/facefusion-assets/releases/download/models/arcface_w600k_r50.onnx',
+		'url': 'https://github.com/lab861265/fusion2/releases/download/assets/arcface_w600k_r50.onnx',
 		'path': resolve_relative_path('../.assets/models/arcface_w600k_r50.onnx')
 	},
 	'face_recognizer_arcface_simswap':
 	{
-		'url': 'https://github.com/facefusion/facefusion-assets/releases/download/models/arcface_simswap.onnx',
+		'url': 'https://github.com/lab861265/fusion2/releases/download/assets/arcface_simswap.onnx',
 		'path': resolve_relative_path('../.assets/models/arcface_simswap.onnx')
 	},
 	'gender_age':
 	{
-		'url': 'https://github.com/facefusion/facefusion-assets/releases/download/models/gender_age.onnx',
+		'url': 'https://github.com/lab861265/fusion2/releases/download/assets/gender_age.onnx',
 		'path': resolve_relative_path('../.assets/models/gender_age.onnx')
 	}
 }
