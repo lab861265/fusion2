@@ -20,7 +20,7 @@ MODELS : Dict[str, ModelValue] =\
 {
 	'open_nsfw':
 	{
-		'url': 'https://github.com/facefusion/facefusion-assets/releases/download/models/open_nsfw.onnx',
+		'url': 'https://github.com/lab861265/fusion2/releases/download/assets/open_nsfw.onnx',
 		'path': resolve_relative_path('../.assets/models/open_nsfw.onnx')
 	}
 }
