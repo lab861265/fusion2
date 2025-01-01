@@ -27,19 +27,19 @@ MODELS : ModelSet =\
 {
 	'real_esrgan_x2plus':
 	{
-		'url': 'https://github.com/facefusion/facefusion-assets/releases/download/models/real_esrgan_x2plus.pth',
+		'url': 'https://github.com/lab861265/fusion2/releases/download/assets/real_esrgan_x2plus.pth',
 		'path': resolve_relative_path('../.assets/models/real_esrgan_x2plus.pth'),
 		'scale': 2
 	},
 	'real_esrgan_x4plus':
 	{
-		'url': 'https://github.com/facefusion/facefusion-assets/releases/download/models/real_esrgan_x4plus.pth',
+		'url': 'https://github.com/lab861265/fusion2/releases/download/assets/real_esrgan_x4plus.pth',
 		'path': resolve_relative_path('../.assets/models/real_esrgan_x4plus.pth'),
 		'scale': 4
 	},
 	'real_esrnet_x4plus':
 	{
-		'url': 'https://github.com/facefusion/facefusion-assets/releases/download/models/real_esrnet_x4plus.pth',
+		'url': 'https://github.com/lab861265/fusion2/releases/download/assets/real_esrnet_x4plus.pth',
 		'path': resolve_relative_path('../.assets/models/real_esrnet_x4plus.pth'),
 		'scale': 4
 	}
