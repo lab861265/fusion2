@@ -53,14 +53,14 @@ def convert_to_720p(input_path, need_credit, start_time=0, end_time=0):
     if resolution[1] > 1080:  # 仅在高度大于720时缩放
         drawtext_filter = (
             f"scale=trunc(iw*1080/ih/2)*2:1080,"
-            f"drawtext=text='AI generated':"
+            f"drawtext=text='':"
             f"x=w-tw-20:y=h-th-20:fontsize=h*0.03:"
             f"fontcolor=white@0.3:shadowx=2:shadowy=2:shadowcolor=black@0.3"
         )
         ffmpeg_command.extend(['-vf', drawtext_filter])
     else:  # 不缩放，仅添加水印
         drawtext_filter = (
-            f"drawtext=text='AI generated':"
+            f"drawtext=text='':"
             f"x=w-tw-20:y=h-th-20:fontsize=h*0.03:"
             f"fontcolor=white@0.3:shadowx=2:shadowy=2:shadowcolor=black@0.3"
         )
@@ -101,7 +101,7 @@ def add_watermark_to_mp4(input_path):
     ffmpeg_command = ['ffmpeg', '-y', '-i', renamed_path]
 
     drawtext_filter = (
-        f"drawtext=text='AI generated':"
+        f"drawtext=text='':"
         f"x=w-tw-20:y=h-th-20:fontsize=h*0.03:"
         f"fontcolor=white@0.3:shadowx=2:shadowy=2:shadowcolor=black@0.3"
     )
@@ -128,7 +128,7 @@ def add_watermark_to_image(input_path):
     ffmpeg_command = [
         "ffmpeg", "-y", "-i", input_path,
         "-vf",
-        f"drawtext=text='AI generated':"
+        f"drawtext=text='':"
         f"x=w-tw-20:y=h-th-20:fontsize=24:"
         f"fontcolor=white@0.3:shadowx=2:shadowy=2:shadowcolor=black@0.3",
         output_path
