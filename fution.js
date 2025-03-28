@@ -178,6 +178,9 @@ class ApiClient {
       let method = 'POST';
       
       url = `${API_BASE_URL}/${name}`;
+
+      console.log('url:', url);
+
       
       const config = {
         method,
@@ -233,7 +236,7 @@ class ApiClient {
    */
   static async uploadFile(filePath) {
     console.log("获取上传地址:", filePath);
-    const res = await this.callApi("workerSignS3", { 'filename': filePath });
+    const res = await this.callApi("mediaPro/workerSignS3/" + path.extname(filePath).substr(1), { 'filename': filePath });
     console.log("获取上传地址res:", res);
     
     if (res.code < 0) {
