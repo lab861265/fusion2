@@ -5,6 +5,7 @@ from queue import Queue
 from types import ModuleType
 from typing import Any, List
 from tqdm import tqdm
+import inspect
 
 import facefusion.globals
 from facefusion.typing import Process_Frames
@@ -67,7 +68,16 @@ def clear_frame_processors_modules() -> None:
 
 
 def multi_process_frames(source_paths : List[str], temp_frame_paths : List[str], process_frames : Process_Frames) -> None:
-	with tqdm(total = len(temp_frame_paths), desc = wording.get('processing'), unit = 'frame', ascii = ' =', disable = facefusion.globals.log_level in [ 'warn', 'error' ]) as progress:
+	caller_frame = inspect.currentframe().f_back
+	caller_module = inspect.getmodule(caller_frame)
+	module_name = caller_module.__name__.split('.')[-1].upper() if caller_module else 'UNKNOWN'
+	
+	# 在描述中添加模块名称
+	processing_desc = f"[{module_name}] {wording.get('processing')}"
+	
+	with tqdm(total = len(temp_frame_paths), desc = processing_desc, unit = 'frame', ascii = ' =', disable = facefusion.globals.log_level in [ 'warn', 'error' ]) as progress:
+	
+  #with tqdm(total = len(temp_frame_paths), desc = wording.get('processing'), unit = 'frame', ascii = ' =', disable = facefusion.globals.log_level in [ 'warn', 'error' ]) as progress:
 		progress.set_postfix(
 		{
 			'execution_providers': encode_execution_providers(facefusion.globals.execution_providers),
