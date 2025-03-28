@@ -263,9 +263,11 @@ class MediaProcessor {
    * @param {number} endTime 
    */
   static async convertToResolution(inputPath, resolution, needCredit, startTime = 0, endTime = 0) {
+
+    console.log('resolution:', resolution);
     // 分辨率映射
     const resolutionMap = {
-      -1:720,
+      0:720,
       1: 480,  // 480p
       2: 720,  // 720p
       3: 1080, // 1080p
@@ -294,7 +296,7 @@ class MediaProcessor {
     let applyFrameCut = endTime > startTime;
 
     let drawTextFilter;
-    if (resolution >= 0) {
+    if (resolution > 0) {
       drawTextFilter = `scale=trunc(iw*${targetHeight}/ih/2)*2:${targetHeight},` +
                        `drawtext=text='ai':` +
                        `x=w-tw-20:y=h-th-20:fontsize=h*0.03:` +
@@ -306,12 +308,12 @@ class MediaProcessor {
     }
 
     // 是否加上帧裁剪的 select 过滤器
-    if (applyFrameCut) {
-      ffmpegCommand.push('-ss', startTime.toString());
-      ffmpegCommand.push('-to', endTime.toString());
-    } else {
-      ffmpegCommand.push('-vf', drawTextFilter); // 只加水印，不裁剪
-    }
+
+    ffmpegCommand.push('-ss', startTime.toString());
+    ffmpegCommand.push('-to', endTime.toString());
+
+    ffmpegCommand.push('-vf', drawTextFilter); // 只加水印，不裁剪
+  
 
     // 设置输出路径
     ffmpegCommand.push('media.mp4'); 
@@ -690,7 +692,7 @@ class Worker {
     
     // 解析参数
     const isEnhancement = parseInt(params.isEnhancement || 0);
-    const resolution = parseInt(params.resolution || -1);  // 默认不变
+    const resolution = parseInt(params.resolution || 0);  // 默认不变
     const needCredit = parseInt(this.taskData.needCredit || 0);
     
 
