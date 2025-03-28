@@ -9,6 +9,8 @@ const crypto = require('crypto');
 const { URL } = require('url');
 const axios = require('axios');
 
+global.task = {};
+
 // 配置
 const API_BASE_URL = 'https://api.fakeface.io/api';
 const MODEL_MAP = {
@@ -32,7 +34,7 @@ function runCmd(cmd, args){
         });
 
         // 实时打印 stderr（FFmpeg 的进度条等都在这里）
-        ffmpegProcess.stderr.on('data', (data) => {
+        ffmpegProcess.stderr.on('data', async (data) => {
           const lines = data.toString().split('\n');
           for (const line of lines) {
               const match = line.match(/\[([^\]]+)\] Processing:\s+(\d+%)\|.*\|\s+(\d+\/\d+).*?([\d.]+)frame\/s/);
@@ -43,6 +45,7 @@ function runCmd(cmd, args){
                       frameCount: match[3],          // "10/570"
                       fps: parseFloat(match[4])      // 23.32
                   };
+                  const data = await ApiClient.callApi("v1/worker_task_process/" + global.task._id, json);
                   console.log(JSON.stringify(json));
               }
           }  
@@ -653,9 +656,13 @@ class Worker {
     } catch (e) {
       console.error(`Error deleting files: ${e.message}`);
     }
+
     
+    global.task = data.data;
     this.taskData = data.data;
     const params = this.taskData.params || {};
+
+
     
     // 获取media_id和face_id
     const mediaId = params.media_id || '';
