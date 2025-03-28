@@ -505,15 +505,13 @@ class MediaProcessor {
     resolution = 2, 
     modelId = 1, 
     referenceFrame = 0, 
-    referenceFacePosition = 0
+    referenceFacePosition = 0,
+    mode = 'cuda'
   ) {
     console.log(mediaFilename, faceFilename, outFilePath);
     
     // 选择模型
     const modelName = MODEL_MAP[modelId] || "inswapper_128";
-    
-    // 确定执行模式（CPU/GPU）
-    const mode = process.argv[2] === 'cpu' ? 'cpu' : 'cuda';
     
     // 构建facefusion命令
     const command = [
@@ -698,7 +696,7 @@ class Worker {
       const outFilePath = 'media_out.mp4';
       await MediaProcessor.procMedia(
         'media.mp4', faceFilename, outFilePath, isEnhancement, needCredit,
-        resolution, modelId, referenceFacePosition<0?0:(referenceFrame - startFrame + 1), referenceFacePosition
+        resolution, modelId, referenceFacePosition<0?0:(referenceFrame - startFrame + 1), referenceFacePosition, 'cuda'
       );
       
       const thumbFilePath = 'thumb_media.jpg';
@@ -737,7 +735,7 @@ class Worker {
       
       await MediaProcessor.procMedia(
         'media.mp4', faceFilename, outFilePath, isEnhancement, needCredit,
-        resolution, modelId, referenceFrame, referenceFacePosition
+        resolution, modelId, referenceFrame, referenceFacePosition, 'cuda'
       );
       
       const thumbFilePath = 'thumb_media.jpg';
@@ -776,7 +774,7 @@ class Worker {
 
       await MediaProcessor.procMedia(
         mediaFilePath, faceFilename, outFilePath, isEnhancement, needCredit,
-        resolution, modelId, 0, referenceFacePosition
+        resolution, modelId, 0, referenceFacePosition, 'cpu'
       );
       
       const thumbFilePath = 'thumb_media.jpg';
