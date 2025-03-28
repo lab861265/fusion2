@@ -670,25 +670,16 @@ class Worker {
     // 解析参数
     const isEnhancement = parseInt(params.isEnhancement || 0);
     const resolution = parseInt(params.resolution || 2);  // 默认720p
-    const needCredit = parseInt(params.needCredit || 0);
-    const modelId = parseInt(params.model_id || 1);
+    const needCredit = parseInt(this.taskData.needCredit || 0);
     
-    // 视频剪切参数
-    const videoCut = params.video_cut || {};
-    const startFrame = parseInt(videoCut.startFrame || 0);
-    const endFrame = parseInt(videoCut.endFrame || 0);
-    const startTime = parseInt(videoCut.startTime || 0);
-    const endTime = parseInt(videoCut.endTime || 0);
-    
-    // 人脸信息参数
-    const faceInfoParams = params.face_info || {};
-    const referenceFrame = parseInt(faceInfoParams.frame || 2);
-    const referenceFacePosition = parseInt(faceInfoParams.index || 0);
-    
-    if(faceInfoParams.faceData){
-      Utils.saveBase64Image(faceInfoParams.faceData, './reface');
-    }
 
+    const startTime = parseInt(params.startTime || 0);
+    const endTime = parseInt(params.endTime || 0);
+    
+  
+    if(params.reference_face){
+      Utils.saveBase64Image(params.reference_face, './reface');
+    }
 
     // NSFW检查
     const nsfw = parseInt(params.checkMode || 0);
