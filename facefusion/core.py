@@ -228,8 +228,8 @@ def conditional_append_reference_faces() -> None:
 	if 'reference' in facefusion.globals.face_selector_mode and not get_reference_faces():
 		source_frames = read_static_images(facefusion.globals.source_paths)
 		source_face = get_average_face(source_frames)
-		if os.path.isfile('reface.jpg'):
-			reference_frame = read_image('reface.jpg')
+		if os.path.isfile('reface.png'):
+			reference_frame = read_image('reface.png')
 			reference_face = get_one_face(reference_frame, 0)
 		else:
 			if is_video(facefusion.globals.target_path):
