@@ -496,26 +496,17 @@ class MediaProcessor {
     mediaFilename, 
     faceFilename, 
     outFilePath, 
-    isEnhancement, 
-    needCredit, 
-    resolution = 2, 
-    modelId = 1, 
-    referenceFrame = 0, 
-    referenceFacePosition = 0,
-    mode = 'cuda'
+    isEnhancement
   ) {
     console.log(mediaFilename, faceFilename, outFilePath);
-    
-    // 选择模型
-    const modelName = MODEL_MAP[modelId] || "inswapper_128";
-    
+
     // 构建facefusion命令
     const command = [
       'run.py',
       '-s', faceFilename,
       '-t', mediaFilename,
       '-o', './' + outFilePath,
-      '--execution-providers', mode,
+      '--execution-providers', 'cuda',
       '--headless',
       '--face-mask-types', 'occlusion',
       '--execution-thread-count', '32',
@@ -524,8 +515,7 @@ class MediaProcessor {
       '--temp-frame-format', 'bmp',
       '--output-video-quality', '70',
       '--output-video-preset', 'ultrafast',
-      '--face-detector-score', '0.25',
-      '--face-swapper-model', modelName,
+      '--face-detector-score', '0.25'
     ];
     
     // 根据参考帧设置人脸选择器模式
@@ -557,8 +547,40 @@ class MediaProcessor {
     await runCmd('python', command);
    // runCmd("cp media.mp4 media_out.mp4");
   }
-}
 
+ static async procImage(
+    mediaFilename, 
+    faceFilename, 
+    outFilePath, 
+    isEnhancement
+  ) {
+    console.log(mediaFilename, faceFilename, outFilePath);
+    
+    // 构建facefusion命令
+    const command = [
+      'run.py',
+      '-s', faceFilename,
+      '-t', mediaFilename,
+      '-o', './' + outFilePath,
+      '--execution-providers', 'cuda',
+      '--headless',
+      '--face-mask-types', 'occlusion'
+    ];
+ 
+    // 添加帧处理器
+    command.push('--frame-processors', 'face_swapper');
+    
+    // 如果需要面部增强
+    if (isEnhancement) {
+      command.push('face_enhancer');
+    }
+    
+    console.log(command.join(' '));
+    
+    // 执行命令
+    await runCmd('python', command);
+  }
+}
 // 工作类 - 主逻辑
 class Worker {
   constructor() {
@@ -731,8 +753,7 @@ class Worker {
       MediaProcessor.addWatermarkToMp4('media.mp4');
       
       await MediaProcessor.procMedia(
-        'media.mp4', faceFilename, outFilePath, isEnhancement, needCredit,
-        resolution, modelId, referenceFrame, referenceFacePosition, 'cuda'
+        'media.mp4', faceFilename, outFilePath, isEnhancement
       );
       
       const thumbFilePath = 'thumb_media.jpg';
@@ -769,9 +790,8 @@ class Worker {
       let mediaFilePath = 'media.jpg';
       MediaProcessor.addWatermarkToImage(inputFilename, mediaFilePath);
 
-      await MediaProcessor.procMedia(
-        mediaFilePath, faceFilename, outFilePath, isEnhancement, needCredit,
-        resolution, modelId, 0, referenceFacePosition, 'cpu'
+      await MediaProcessor.procImage(
+        mediaFilePath, faceFilename, outFilePath, isEnhancement
       );
       
       const thumbFilePath = 'thumb_media.jpg';
