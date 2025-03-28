@@ -259,7 +259,7 @@ class MediaProcessor {
    * @param {number} startTime 
    * @param {number} endTime 
    */
-  static async convertToResolution(inputPath, resolution, needCredit, startFrame = 0, endTime = 0) {
+  static async convertToResolution(inputPath, resolution, needCredit, startTime = 0, endTime = 0) {
     // 分辨率映射
     const resolutionMap = {
       1: 480,  // 480p
@@ -287,7 +287,7 @@ class MediaProcessor {
     const [width, height, frameRate] = ffprobeOutput.split(',');
 
     // 判断是否需要按帧裁剪
-    let applyFrameCut = startFrame;
+    let applyFrameCut = endTime > startTime;
 
     let drawTextFilter;
     if (parseInt(height) > targetHeight) {
@@ -303,12 +303,8 @@ class MediaProcessor {
 
     // 是否加上帧裁剪的 select 过滤器
     if (applyFrameCut) {
-    //  const frameFilter = `select='between(n\\,${startFrame}\\,${endFrame})',setpts=N/FRAME_RATE/TB`;
-      const frameFilter = `select='gte(n\\,${startFrame})*lte(t\\,${endTime})',setpts=N/FRAME_RATE/TB`;
-      ffmpegCommand.push('-vf', `${frameFilter},${drawTextFilter}`);
-    //  ffmpegCommand.push('-af', `aselect='between(n\\,${startFrame}\\,${endFrame})',asetpts=N/SR/TB`);
-      ffmpegCommand.push('-af', `aselect='gte(n\\,${startFrame})*lte(t\\,${endTime})',asetpts=N/SR/TB`);
-
+      ffmpegCommand.push('-ss', startTime.toString());
+      ffmpegCommand.push('-to', endTime.toString());
     } else {
       ffmpegCommand.push('-vf', drawTextFilter); // 只加水印，不裁剪
     }
@@ -659,6 +655,7 @@ class Worker {
     const videoCut = params.video_cut || {};
     const startFrame = parseInt(videoCut.startFrame || 0);
     const endFrame = parseInt(videoCut.endFrame || 0);
+    const startTime = parseInt(videoCut.startTime || 0);
     const endTime = parseInt(videoCut.endTime || 0);
     
     // 人脸信息参数
@@ -687,7 +684,7 @@ class Worker {
     if (videoExtensions.includes(extName)) {
         //视频要预处理
       try {
-         await MediaProcessor.convertToResolution(inputFilename, resolution, needCredit, startFrame, endTime);
+         await MediaProcessor.convertToResolution(inputFilename, resolution, needCredit, startTime, endTime);
     //      runCmd(`ffmpeg -i ${inputFilename} -vf "drawtext=text='My Watermark':fontcolor=white:fontsize=24:x=10:y=10" -c:a copy ${mediaFilename}`);
       } catch (e) {
         console.error(e.message);
