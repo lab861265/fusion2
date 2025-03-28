@@ -33,7 +33,19 @@ function runCmd(cmd, args){
 
         // 实时打印 stderr（FFmpeg 的进度条等都在这里）
         ffmpegProcess.stderr.on('data', (data) => {
-            process.stderr.write(data); // 不换行，保留 FFmpeg 原始格式
+          const lines = data.toString().split('\n');
+          for (const line of lines) {
+              const match = line.match(/\[([^\]]+)\] Processing:\s+(\d+%)\|.*\|\s+(\d+\/\d+).*?([\d.]+)frame\/s/);
+              if (match) {
+                  const json = {
+                      module: match[1],              // "FACE_SWAPPER"
+                      progress: match[2],            // "2%"
+                      frameCount: match[3],          // "10/570"
+                      fps: parseFloat(match[4])      // 23.32
+                  };
+                  console.log(JSON.stringify(json));
+              }
+          }  
         });
 
         // 进程结束回调
