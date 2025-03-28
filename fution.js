@@ -55,6 +55,25 @@ class Utils {
     return crypto.createHash('md5').update(inputString).digest('hex');
   }
 
+  static saveBase64Image(base64String, outputPath) {
+    const matches = base64String.match(/^data:(.+);base64,(.+)$/);
+    if (!matches || matches.length !== 3) {
+      throw new Error('无效的 base64 图片字符串');
+    }
+
+    const mimeType = matches[1];     // 例如 image/png
+    const extension = mimeType.split('/')[1]; // png
+    const imageData = matches[2];    // base64 数据
+
+    // 自动补全扩展名
+    const fullPath = outputPath.endsWith(`.${extension}`)
+      ? outputPath
+      : `${outputPath}.${extension}`;
+
+    fs.writeFileSync(fullPath, Buffer.from(imageData, 'base64'));
+    console.log(`图片已保存为：${fullPath}`);
+  }
+
   /**
    * 删除文件列表
    * @param {string[]} filePaths 
@@ -649,6 +668,11 @@ class Worker {
     const referenceFrame = parseInt(faceInfoParams.frame || 2);
     const referenceFacePosition = parseInt(faceInfoParams.index || 0);
     
+    if(faceInfoParams.faceData){
+      Utils.saveBase64Image(faceInfoParams.faceData, './reface');
+    }
+
+
     // NSFW检查
     const nsfw = parseInt(params.checkMode || 0);
     if (nsfw === 1) {
