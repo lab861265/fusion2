@@ -418,7 +418,7 @@ class MediaProcessor {
     const ffmpegCommand = [
       'ffmpeg',
       '-i', gifPath,
-      '-vf', 'scale=trunc(iw/2)*2:trunc(ih/2)*2',
+      '-vf', '"scale=trunc(iw/2)*2:trunc(ih/2)*2"',
       '-movflags', 'faststart',
       '-pix_fmt', 'yuv420p',
       '-y',
@@ -442,7 +442,7 @@ class MediaProcessor {
       'ffmpeg',
       '-y',
       '-i', inputMp4Filename,
-      '-vf', 'fps=15,scale=500:-1:flags=lanczos,palettegen',
+      '-vf', '"fps=15,scale=500:-1:flags=lanczos,palettegen"',
       paletteFile
     ];
     
@@ -454,7 +454,7 @@ class MediaProcessor {
       '-y',
       '-i', inputMp4Filename,
       '-i', paletteFile,
-      '-lavfi', 'fps=10 [x]; [x][1:v] paletteuse',
+      '-lavfi', '"fps=10 [x]; [x][1:v] paletteuse"',
       outputGifFilename
     ];
     
@@ -496,7 +496,8 @@ class MediaProcessor {
     mediaFilename, 
     faceFilename, 
     outFilePath, 
-    isEnhancement
+    isEnhancement,
+    isReference = 0
   ) {
     console.log(mediaFilename, faceFilename, outFilePath);
 
@@ -519,12 +520,12 @@ class MediaProcessor {
     ];
     
     // 根据参考帧设置人脸选择器模式
-    if (referenceFrame > 0) {
+    if (isReference) {
       command.push(
         '--face-selector-mode', 'reference',
-        '--reference-frame-number', String(referenceFrame),
+        '--reference-frame-number', 0,
         '--reference-face-distance', '0.8',
-        '--reference-face-position', String(referenceFacePosition)
+        '--reference-face-position', 0
       );
     } else {
       command.push(
@@ -552,7 +553,8 @@ class MediaProcessor {
     mediaFilename, 
     faceFilename, 
     outFilePath, 
-    isEnhancement
+    isEnhancement,
+    isReference = 0
   ) {
     console.log(mediaFilename, faceFilename, outFilePath);
     
@@ -566,6 +568,21 @@ class MediaProcessor {
       '--headless',
       '--face-mask-types', 'occlusion'
     ];
+
+    // 根据参考帧设置人脸选择器模式
+    if (isReference) {
+      command.push(
+        '--face-selector-mode', 'reference',
+        '--reference-frame-number', 0,
+        '--reference-face-distance', '0.8',
+        '--reference-face-position', 0
+      );
+    } else {
+      command.push(
+        '--face-selector-mode', 'many',
+        '--face-analyser-order', 'best-worst'
+      );
+    }
  
     // 添加帧处理器
     command.push('--frame-processors', 'face_swapper');
@@ -679,6 +696,7 @@ class Worker {
   
     if(params.reference_face){
       Utils.saveBase64Image(params.reference_face, './reface');
+      MediaProcessor.addBorder('reface.png', 'reface.png');
     }
 
     // NSFW检查
@@ -705,8 +723,7 @@ class Worker {
     
       const outFilePath = 'media_out.mp4';
       await MediaProcessor.procMedia(
-        'media.mp4', faceFilename, outFilePath, isEnhancement, needCredit,
-        resolution, modelId, referenceFacePosition<0?0:(referenceFrame - startFrame + 1), referenceFacePosition, 'cuda'
+        'media.mp4', faceFilename, outFilePath, isEnhancement, params.reference_face?1:0
       );
       
       const thumbFilePath = 'thumb_media.jpg';
@@ -740,11 +757,11 @@ class Worker {
     } else if (extName === '.gif') {
       // 处理GIF文件
       const outFilePath = 'media_out.mp4';
-      MediaProcessor.gif2mp4(mediaFilename, 'media.mp4');
+      MediaProcessor.gif2mp4(inputFilename, 'media.mp4');
       MediaProcessor.addWatermarkToMp4('media.mp4');
       
       await MediaProcessor.procMedia(
-        'media.mp4', faceFilename, outFilePath, isEnhancement
+        'media.mp4', faceFilename, outFilePath, isEnhancement, params.reference_face?1:0
       );
       
       const thumbFilePath = 'thumb_media.jpg';
@@ -773,7 +790,7 @@ class Worker {
         'file_hash': now
       };  
       console.log('mediaData:', mediaData);
-      apiRes = await ApiClient.callApi("v1/worker_task_set", {state:3, task_id:this.taskData._id, result:mediaData});
+      let apiRes = await ApiClient.callApi("v1/worker_task_set", {state:3, task_id:this.taskData._id, result:mediaData});
       return;
     } else if (['.jpg', '.webp', '.jpeg', '.png'].includes(extName)) {
       // 处理图像文件
@@ -782,7 +799,7 @@ class Worker {
       MediaProcessor.addWatermarkToImage(inputFilename, mediaFilePath);
 
       await MediaProcessor.procImage(
-        mediaFilePath, faceFilename, outFilePath, isEnhancement
+        mediaFilePath, faceFilename, outFilePath, isEnhancement, params.reference_face?1:0
       );
       
       const thumbFilePath = 'thumb_media.jpg';
