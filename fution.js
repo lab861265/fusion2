@@ -20,7 +20,7 @@ const MODEL_MAP = {
 };
 
 
-function runCmdFast(){
+function runCmdFast(cmd){
    execSync(cmd, { stdio: 'inherit' });
 }
 function runCmd(cmd, args){
@@ -213,8 +213,9 @@ class ApiClient {
    * @returns {Promise<string|boolean>} 公开URL或失败标志
    */
   static async uploadFile(filePath) {
+    console.log("获取上传地址:", filePath);
     const res = await this.callApi("workerSignS3", { 'filename': filePath });
-    console.log(res);
+    console.log("获取上传地址res:", res);
     
     if (res.code < 0) {
       console.log('sign s3url error');
@@ -239,7 +240,7 @@ class MediaProcessor {
    * @param {number} startTime 
    * @param {number} endTime 
    */
-  static async convertToResolution(inputPath, resolution, needCredit, startFrame = 0, endFrame = 0) {
+  static async convertToResolution(inputPath, resolution, needCredit, startFrame = 0, endTime = 0) {
     // 分辨率映射
     const resolutionMap = {
       1: 480,  // 480p
@@ -267,7 +268,7 @@ class MediaProcessor {
     const [width, height, frameRate] = ffprobeOutput.split(',');
 
     // 判断是否需要按帧裁剪
-    let applyFrameCut = endFrame > startFrame;
+    let applyFrameCut = startFrame;
 
     let drawTextFilter;
     if (parseInt(height) > targetHeight) {
@@ -283,9 +284,12 @@ class MediaProcessor {
 
     // 是否加上帧裁剪的 select 过滤器
     if (applyFrameCut) {
-      const frameFilter = `select='between(n\\,${startFrame}\\,${endFrame})',setpts=N/FRAME_RATE/TB`;
+    //  const frameFilter = `select='between(n\\,${startFrame}\\,${endFrame})',setpts=N/FRAME_RATE/TB`;
+      const frameFilter = `select='gte(n\\,${startFrame})*lte(t\\,${endTime})',setpts=N/FRAME_RATE/TB`;
       ffmpegCommand.push('-vf', `${frameFilter},${drawTextFilter}`);
-      ffmpegCommand.push('-af', `aselect='between(n\\,${startFrame}\\,${endFrame})',asetpts=N/SR/TB`);
+    //  ffmpegCommand.push('-af', `aselect='between(n\\,${startFrame}\\,${endFrame})',asetpts=N/SR/TB`);
+      ffmpegCommand.push('-af', `aselect='gte(n\\,${startFrame})*lte(t\\,${endTime})',asetpts=N/SR/TB`);
+
     } else {
       ffmpegCommand.push('-vf', drawTextFilter); // 只加水印，不裁剪
     }
@@ -334,11 +338,8 @@ class MediaProcessor {
    * 为图像添加水印
    * @param {string} inputPath 
    */
-  static addWatermarkToImage(inputPath) {
-    // 构建输出文件名
-    const fileName = path.basename(inputPath);
-    const outputPath = path.join(path.dirname(inputPath), fileName);
-    
+  static addWatermarkToImage(inputPath, outputPath) {
+
     // 构建FFmpeg命令
     const ffmpegCommand = [
       'ffmpeg', '-y', '-i', inputPath,
@@ -620,9 +621,9 @@ class Worker {
     // 下载文件
     const mediaExt = path.extname(mediaFileUrl);
     const faceExt = path.extname(faceFileUrl);
-    const inputFilename = "input" + mediaExt;
-    const mediaFilename = "media.mp4";
-    const faceFilename = "face" + faceExt;
+    var inputFilename = "input" + mediaExt;
+    var mediaFilename = "media" + mediaExt;
+    var faceFilename = "face" + faceExt;
     
     await Utils.downloadFile(mediaFileUrl, inputFilename);
     await Utils.downloadFile(faceFileUrl, faceFilename);
@@ -641,6 +642,7 @@ class Worker {
     const videoCut = params.video_cut || {};
     const startFrame = parseInt(videoCut.startFrame || 0);
     const endFrame = parseInt(videoCut.endFrame || 0);
+    const endTime = parseInt(videoCut.endTime || 0);
     
     // 人脸信息参数
     const faceInfoParams = params.face_info || {};
@@ -663,17 +665,16 @@ class Worker {
     if (videoExtensions.includes(extName)) {
         //视频要预处理
       try {
-         await MediaProcessor.convertToResolution(inputFilename, resolution, needCredit, startFrame, endFrame);
+         await MediaProcessor.convertToResolution(inputFilename, resolution, needCredit, startFrame, endTime);
     //      runCmd(`ffmpeg -i ${inputFilename} -vf "drawtext=text='My Watermark':fontcolor=white:fontsize=24:x=10:y=10" -c:a copy ${mediaFilename}`);
       } catch (e) {
         console.error(e.message);
       }
-      
-        return;
+    
       const outFilePath = 'media_out.mp4';
       await MediaProcessor.procMedia(
         'media.mp4', faceFilename, outFilePath, isEnhancement, needCredit,
-        resolution, modelId, referenceFrame, referenceFacePosition
+        resolution, modelId, referenceFacePosition<0?0:(referenceFrame - startFrame + 1), referenceFacePosition
       );
       
       const thumbFilePath = 'thumb_media.jpg';
@@ -700,7 +701,7 @@ class Worker {
         'file_hash': now
       };
       console.log('mediaData:', mediaData);
-      const apiRes = await ApiClient.callApi("v1/worker_task_set", {state:3, task_id:this.taskData._id, result:mediaData});
+      let apiRes = await ApiClient.callApi("v1/worker_task_set", {state:3, task_id:this.taskData._id, result:mediaData});
       
       console.log('Api result:', apiRes);
       return;
@@ -710,7 +711,7 @@ class Worker {
       MediaProcessor.gif2mp4(mediaFilename, 'media.mp4');
       MediaProcessor.addWatermarkToMp4('media.mp4');
       
-      MediaProcessor.procMedia(
+      await MediaProcessor.procMedia(
         'media.mp4', faceFilename, outFilePath, isEnhancement, needCredit,
         resolution, modelId, referenceFrame, referenceFacePosition
       );
@@ -733,35 +734,33 @@ class Worker {
       const finishMediaId = params.media_id || '';
 
 
-      const apiRes = await ApiClient.callApi("workerAddMedia", {
+      let mediaData = {
         'user_id': this.taskData.user_id,
         'media_id': finishMediaId,
         'file_url': uploadVideoUrl,
         'thumb_url': uploadImageUrl,
         'file_hash': now
-      });
-
-
-      
-      console.log('Api result:', apiRes);
-      await ApiClient.addLog(this.taskData, true, 3, 'finish', 100);
+      };  
+      console.log('mediaData:', mediaData);
+      apiRes = await ApiClient.callApi("v1/worker_task_set", {state:3, task_id:this.taskData._id, result:mediaData});
       return;
     } else if (['.jpg', '.webp', '.jpeg', '.png'].includes(extName)) {
       // 处理图像文件
-      const outFilePath = 'media_out.jpg';
-      MediaProcessor.addWatermarkToImage(mediaFilename);
-      
-      MediaProcessor.procMedia(
-        mediaFilename, faceFilename, outFilePath, isEnhancement, needCredit,
-        resolution, modelId, referenceFrame, referenceFacePosition
+      let outFilePath = 'media_out.jpg';
+      let mediaFilePath = 'media.jpg';
+      MediaProcessor.addWatermarkToImage(inputFilename, mediaFilePath);
+
+      await MediaProcessor.procMedia(
+        mediaFilePath, faceFilename, outFilePath, isEnhancement, needCredit,
+        resolution, modelId, 0, referenceFacePosition
       );
       
       const thumbFilePath = 'thumb_media.jpg';
       MediaProcessor.generateImgThumbnail(outFilePath, thumbFilePath);
-      
+
       if (!fs.existsSync(outFilePath)) {
         console.log(`Cannot find file ${outFilePath}`);
-        await ApiClient.addLog(this.taskData, true, -1, 'Processing failed', 99);
+   //     await ApiClient.addLog(this.taskData, true, -1, 'Processing failed', 99);
         return;
       }
       
@@ -770,21 +769,17 @@ class Worker {
       
       const now = new Date().toISOString().replace('T', ' ').substring(0, 19);
       const finishMediaId = params.media_id || '';
-      
-      const apiRes = await ApiClient.callApi("workerAddMedia", {
+      let mediaData = {
         'user_id': this.taskData.user_id,
         'media_id': finishMediaId,
         'file_url': uploadFileUrl,
         'thumb_url': uploadImageUrl,
         'file_hash': now
-      });
-      
-      console.log('Api result:', apiRes);
-      await ApiClient.addLog(this.taskData, true, 3, 'finish', 100);
-      return;
+      };
+      console.log('mediaData:', mediaData);
+      let apiRes = await ApiClient.callApi("v1/worker_task_set", {state:3, task_id:this.taskData._id, result:mediaData});
+
     }
-    
-    await ApiClient.addLog(this.taskData, true, 3, 'wrong file format', 100);
   }
 }
 
