@@ -265,6 +265,7 @@ class MediaProcessor {
   static async convertToResolution(inputPath, resolution, needCredit, startTime = 0, endTime = 0) {
     // 分辨率映射
     const resolutionMap = {
+      -1:720,
       1: 480,  // 480p
       2: 720,  // 720p
       3: 1080, // 1080p
@@ -293,7 +294,7 @@ class MediaProcessor {
     let applyFrameCut = endTime > startTime;
 
     let drawTextFilter;
-    if (parseInt(height) > targetHeight) {
+    if (resolution >= 0) {
       drawTextFilter = `scale=trunc(iw*${targetHeight}/ih/2)*2:${targetHeight},` +
                        `drawtext=text='ai':` +
                        `x=w-tw-20:y=h-th-20:fontsize=h*0.03:` +
@@ -689,7 +690,7 @@ class Worker {
     
     // 解析参数
     const isEnhancement = parseInt(params.isEnhancement || 0);
-    const resolution = parseInt(params.resolution || 2);  // 默认720p
+    const resolution = parseInt(params.resolution || -1);  // 默认不变
     const needCredit = parseInt(this.taskData.needCredit || 0);
     
 
