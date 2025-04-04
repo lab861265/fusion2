@@ -290,7 +290,9 @@ async function main() {
     // Check if task fetch was successful
     if (taskResponse.code !== 0) {
       console.error(`Task fetch failed: ${taskResponse.info}`);
+      return;
         await new Promise(r => setTimeout(r, 3000));
+        
         continue;
     }
     
