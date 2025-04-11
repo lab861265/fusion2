@@ -633,7 +633,7 @@ class Worker {
     const term = process.argv[3] || 'cuda';
     
     // 获取任务
-    const data = await ApiClient.callApi("v1/worker_task_get/faceSwap", {
+    const data = await ApiClient.callApi("v1/worker_task_get/faceSwap/" + term, {
       'sc': process.argv[4] || '',
       'mode': mode,
       'term': term
