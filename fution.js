@@ -26,35 +26,99 @@ function runCmdFast(cmd){
    execSync(cmd, { stdio: 'inherit' });
 }
 function runCmd(cmd, args){
-    console.log(cmd, args);
+    // 只输出命令本身，不输出详细参数
+    console.log(`执行命令: ${cmd}`);
     const ffmpegProcess = spawn(cmd, args);
-    return new Promise((resolve, reject)=> {
+    
+    // 超时检测变量
+    let lastDataTime = Date.now();
+    const timeoutDuration = 5 * 60 * 1000; // 5分钟超时
+    let timeoutTimer;
+    
+    // 进度更新控制变量
+    let lastUpdateTime = 0;
+    const updateInterval = 5000; // 5秒更新一次
+
+    // 设置超时检测定时器
+    const setupTimeoutCheck = () => {
+        clearTimeout(timeoutTimer);
+        timeoutTimer = setTimeout(() => {
+            const currentTime = Date.now();
+            if (currentTime - lastDataTime > timeoutDuration) {
+                console.error('执行超时（5分钟无数据）：强制终止进程');
+                ffmpegProcess.kill('SIGKILL'); // 强制终止进程
+            } else {
+                setupTimeoutCheck(); // 重新设置检查
+            }
+        }, 30000); // 每30秒检查一次
+    };
+
+    setupTimeoutCheck();
+    
+    return new Promise((resolve, reject) => {
+        // stdout数据处理 - 不再输出详细日志
         ffmpegProcess.stdout.on('data', (data) => {
-            console.log(`[stdout] ${data}`);
+            // 更新最后收到数据的时间
+            lastDataTime = Date.now();
         });
 
-        // 实时打印 stderr（FFmpeg 的进度条等都在这里）
+        // stderr数据处理 - 带有进度更新的限制
         ffmpegProcess.stderr.on('data', async (data) => {
-          const lines = data.toString().split('\n');
-          for (const line of lines) {
-              const match = line.match(/\[([^\]]+)\] Processing:\s+(\d+%)\|.*\|\s+(\d+\/\d+).*?([\d.]+)frame\/s/);
-              if (match) {
-                  const json = {
-                      module: match[1],              // "FACE_SWAPPER"
-                      progress: match[2],            // "2%"
-                      frameCount: match[3],          // "10/570"
-                      fps: parseFloat(match[4])      // 23.32
-                  };
-                  const data = await ApiClient.callApi("v1/worker_task_process/" + global.task._id, json);
-                  console.log(JSON.stringify(json));
-              }
-          }  
+            // 更新最后收到数据的时间
+            lastDataTime = Date.now();
+            
+            const lines = data.toString().split('\n');
+            for (const line of lines) {
+                const match = line.match(/\[([^\]]+)\] Processing:\s+(\d+%)\|.*\|\s+(\d+\/\d+).*?([\d.]+)frame\/s/);
+                if (match) {
+                    const currentTime = Date.now();
+                    
+                    // 限制进度更新频率
+                    if (currentTime - lastUpdateTime >= updateInterval) {
+                        const json = {
+                            module: match[1],              // "FACE_SWAPPER"
+                            progress: match[2],            // "2%"
+                            frameCount: match[3],          // "10/570"
+                            fps: parseFloat(match[4])      // 23.32
+                        };
+                        
+                        // 更新进度
+                        try {
+                            const data = await ApiClient.callApi("v1/worker_task_process/" + global.task._id, json);
+                            // 只记录进度更新，不输出详细数据
+                            console.log(`进度更新: ${json.progress} (${json.frameCount})`);
+                            process.stdout.write(`Progress: ${line} \r`);
+
+                        } catch (error) {
+                            console.error(`进度更新失败: ${error.message}`);
+                        }
+                        
+                        // 更新最后更新时间
+                        lastUpdateTime = currentTime;
+                    }
+                }
+            }
         });
 
         // 进程结束回调
         ffmpegProcess.on('close', (code) => {
-            console.log(`FFmpeg 进程退出，退出码 ${code}`);
-            resolve(code);
+            // 清除超时检测定时器
+            clearTimeout(timeoutTimer);
+            
+            if (Date.now() - lastDataTime > timeoutDuration) {
+                console.log(`进程因超时被终止`);
+                resolve(-9);
+            } else {
+                console.log(`进程正常退出，退出码 ${code}`);
+                resolve(code);
+            }
+        });
+
+        // 进程错误处理
+        ffmpegProcess.on('error', (error) => {
+            clearTimeout(timeoutTimer);
+            console.error(`进程错误: ${error.message}`);
+            resolve(-1);
         });
     });
 }
