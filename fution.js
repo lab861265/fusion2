@@ -247,9 +247,6 @@ class ApiClient {
       
       url = `${API_BASE_URL}/${name}`;
 
-      console.log('url:', url);
-
-      
       const config = {
         method,
         url,
