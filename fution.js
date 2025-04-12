@@ -34,7 +34,7 @@ function runCmd(cmd, args){
     
     // 超时检测变量
     let lastDataTime = Date.now();
-    const timeoutDuration = 5 * 60 * 1000; // 5分钟超时
+    const timeoutDuration = 35 * 60 * 1000; // 5分钟超时
     let timeoutTimer;
     
     // 进度更新控制变量
@@ -47,7 +47,7 @@ function runCmd(cmd, args){
         timeoutTimer = setTimeout(() => {
             const currentTime = Date.now();
             if (currentTime - lastDataTime > timeoutDuration) {
-                console.error('执行超时（5分钟无数据）：强制终止进程');
+                console.error('执行超时（35分钟无数据）：强制终止进程');
                 ffmpegProcess.kill('SIGKILL'); // 强制终止进程
             } else {
                 setupTimeoutCheck(); // 重新设置检查
@@ -68,6 +68,7 @@ function runCmd(cmd, args){
         ffmpegProcess.stderr.on('data', async (data) => {
             // 更新最后收到数据的时间
             const currentTime = Date.now();
+            lastUpdateTime = currentTime;
             if(currentTime - lastUpdateTime < updateInterval){
                 return;
             }
@@ -84,8 +85,8 @@ function runCmd(cmd, args){
              };
              try {
                  const data = await ApiClient.callApi("v1/worker_task_process/" + global.task._id, json);
-                 process.stdout.write(`Progress: ${match[1]} ${match[2]}%    ${match[3]}   fps:${json.fps} \r`);
-                 lastUpdateTime = currentTime;
+                 console.log(`Progress: ${match[1]} ${match[2]}%    ${match[3]}   fps:${json.fps} \r`);
+                 
              } catch (error) {
                  console.error(`进度更新失败: ${error.message}`);
              }
