@@ -82,7 +82,7 @@ function runCmd(cmd, args){
              };
              try {
                  const data = await ApiClient.callApi("v1/worker_task_process/" + global.task._id, json);
-                 process.stdout.write(`Progress: ${match[1]} ${match[2]}%    ${match[3]}   fps:${fps} \r`);
+                 process.stdout.write(`Progress: ${match[1]} ${match[2]}%    ${match[3]}   fps:${json.fps} \r`);
                  lastUpdateTime = currentTime;
              } catch (error) {
                  console.error(`进度更新失败: ${error.message}`);
