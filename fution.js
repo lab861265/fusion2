@@ -86,7 +86,7 @@ function runCmd(cmd, args){
                         try {
                             const data = await ApiClient.callApi("v1/worker_task_process/" + global.task._id, json);
                             // 只记录进度更新，不输出详细数据
-                            console.log(`进度更新: ${json.progress} (${json.frameCount})`);
+                   //         console.log(`进度更新: ${json.progress} (${json.frameCount})`);
                             process.stdout.write(`Progress: ${line} \r`);
 
                         } catch (error) {
