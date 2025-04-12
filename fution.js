@@ -65,40 +65,28 @@ function runCmd(cmd, args){
         // stderr数据处理 - 带有进度更新的限制
         ffmpegProcess.stderr.on('data', async (data) => {
             // 更新最后收到数据的时间
-            
             const currentTime = Date.now();
             if(currentTime - lastUpdateTime < updateInterval){
                 return;
             }
             const lines = data.toString().split('\n');
-            for (const line of lines) {
-                const match = line.match(/\[([^\]]+)\] Processing:\s+(\d+%)\|.*\|\s+(\d+\/\d+).*?([\d.]+)frame\/s/);
-                if (match) {
-                    
-                    
-                        const json = {
-                            module: match[1],              // "FACE_SWAPPER"
-                            progress: match[2],            // "2%"
-                            frameCount: match[3],          // "10/570"
-                            fps: parseFloat(match[4])      // 23.32
-                        };
-                        
-                        // 更新进度
-                        try {
-                            const data = await ApiClient.callApi("v1/worker_task_process/" + global.task._id, json);
-                            // 只记录进度更新，不输出详细数据
-                   //         console.log(`进度更新: ${json.progress} (${json.frameCount})`);
-                            process.stdout.write(`Progress: ${line} \r`);
-
-                        } catch (error) {
-                            console.error(`进度更新失败: ${error.message}`);
-                        }
-                        
-                        // 更新最后更新时间
-                        lastUpdateTime = currentTime;
-    
-                }
-            }
+            if(lines.length <= 0)return;
+            let line = lines[0];
+            const match = line.match(/\[([^\]]+)\] Processing:\s+(\d+%)\|.*\|\s+(\d+\/\d+).*?([\d.]+)frame\/s/);
+            if (!match) {return};
+             const json = {
+                   module: match[1],              // "FACE_SWAPPER"
+                   progress: match[2],            // "2%"
+                   frameCount: match[3],          // "10/570"
+                   fps: parseFloat(match[4])      // 23.32
+             };
+             try {
+                 const data = await ApiClient.callApi("v1/worker_task_process/" + global.task._id, json);
+                 process.stdout.write(`Progress: ${line} \r`);
+                 lastUpdateTime = currentTime;
+             } catch (error) {
+                 console.error(`进度更新失败: ${error.message}`);
+             }
         });
 
         // 进程结束回调
