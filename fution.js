@@ -275,7 +275,7 @@ class ApiClient {
       const response = await axios(config);
       
       if (response.status === 200) {
-        console.log('Request successful', name, response.data);
+    //    console.log('Request successful', name, response.data);
         return response.data;
       } else {
         console.log('Request failed', name);
