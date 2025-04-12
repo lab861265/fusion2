@@ -20,7 +20,7 @@ const MODEL_MAP = {
   4: "simswap_256",
   5: "simswap_512_unofficial"
 };
-
+var lastDataTime = Date.now();
 
 function runCmdFast(cmd){
    execSync(cmd, { stdio: 'inherit' });
@@ -65,7 +65,8 @@ function runCmd(cmd, args){
         // stderr数据处理 - 带有进度更新的限制
         ffmpegProcess.stderr.on('data', async (data) => {
             // 更新最后收到数据的时间
-            lastDataTime = Date.now();
+            
+            const currentTime = Date.now();
             if(currentTime - lastUpdateTime < updateInterval){
                 return;
             }
@@ -73,7 +74,7 @@ function runCmd(cmd, args){
             for (const line of lines) {
                 const match = line.match(/\[([^\]]+)\] Processing:\s+(\d+%)\|.*\|\s+(\d+\/\d+).*?([\d.]+)frame\/s/);
                 if (match) {
-                    const currentTime = Date.now();
+                    
                     
                         const json = {
                             module: match[1],              // "FACE_SWAPPER"
