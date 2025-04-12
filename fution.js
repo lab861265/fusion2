@@ -11,6 +11,8 @@ const axios = require('axios');
 
 global.task = {};
 
+
+//
 // 配置
 const API_BASE_URL = 'https://api.fakeface.io/api';
 const MODEL_MAP = {
