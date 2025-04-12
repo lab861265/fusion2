@@ -66,15 +66,15 @@ function runCmd(cmd, args){
         ffmpegProcess.stderr.on('data', async (data) => {
             // 更新最后收到数据的时间
             lastDataTime = Date.now();
-            
+            if(currentTime - lastUpdateTime < updateInterval){
+                return;
+            }
             const lines = data.toString().split('\n');
             for (const line of lines) {
                 const match = line.match(/\[([^\]]+)\] Processing:\s+(\d+%)\|.*\|\s+(\d+\/\d+).*?([\d.]+)frame\/s/);
                 if (match) {
                     const currentTime = Date.now();
                     
-                    // 限制进度更新频率
-                    if (currentTime - lastUpdateTime >= updateInterval) {
                         const json = {
                             module: match[1],              // "FACE_SWAPPER"
                             progress: match[2],            // "2%"
@@ -95,7 +95,7 @@ function runCmd(cmd, args){
                         
                         // 更新最后更新时间
                         lastUpdateTime = currentTime;
-                    }
+    
                 }
             }
         });
