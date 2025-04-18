@@ -11,6 +11,7 @@ const axios = require('axios');
 
 global.task = {};
 
+let lastLog = "";
 
 //
 // 配置
@@ -47,8 +48,12 @@ function runCmd(cmd, args){
         timeoutTimer = setTimeout(() => {
             const currentTime = Date.now();
             if (currentTime - lastDataTime > timeoutDuration) {
-                console.error('执行超时（35分钟无数据）：强制终止进程');
-                ffmpegProcess.kill('SIGKILL'); // 强制终止进程
+                if(lastLog.indexOf('Processing') >= 0 || lastLog.indexOf('Downloading') >= 0){
+                    console.error('执行超时（35分钟无数据）：强制终止进程');
+                    ffmpegProcess.kill('SIGKILL'); // 强制终止进程
+                }else{
+                    console.error('35分钟无数据,继续等待,最后一次日志:' + lastLog);
+                }
             } else {
                 setupTimeoutCheck(); // 重新设置检查
             }
@@ -75,6 +80,7 @@ function runCmd(cmd, args){
             const lines = data.toString().split('\n');
             if(lines.length <= 0)return;
             let line = lines[0];
+            lastLog = lines[lines.length - 1];
             const match = line.match(/\[([^\]]+)\] Processing:\s+(\d+%)\|.*\|\s+(\d+\/\d+).*?([\d.]+)frame\/s/);
             if (!match) {return};
              const json = {
