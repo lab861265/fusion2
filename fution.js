@@ -604,7 +604,7 @@ class MediaProcessor {
       command.push(
         '--face-selector-mode', 'reference',
         '--reference-frame-number', 0,
-        '--reference-face-distance', '0.85',
+        '--reference-face-distance', '0.8',
         '--reference-face-position', 0
       );
     } else {
