@@ -73,7 +73,6 @@ function runCmd(cmd, args){
         ffmpegProcess.stderr.on('data', async (data) => {
             // 更新最后收到数据的时间
             const currentTime = Date.now();
-            lastUpdateTime = currentTime;
             if(currentTime - lastUpdateTime < updateInterval){
                 return;
             }
@@ -92,10 +91,10 @@ function runCmd(cmd, args){
              try {
                  const data = await ApiClient.callApi("v1/worker_task_process/" + global.task._id, json);
                  console.log(`Progress: ${match[1]} ${match[2]}%    ${match[3]}   fps:${json.fps} \r`);
-                 
              } catch (error) {
                  console.error(`进度更新失败: ${error.message}`);
              }
+             lastUpdateTime = currentTime;
         });
 
         // 进程结束回调
