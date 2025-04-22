@@ -35,7 +35,7 @@ function runCmd(cmd, args){
     
     // 超时检测变量
     let lastDataTime = Date.now();
-    const timeoutDuration = 35 * 60 * 1000; // 5分钟超时
+    const timeoutDuration = 5 * 60 * 1000; // 5分钟超时
     let timeoutTimer;
     
     // 进度更新控制变量
@@ -49,10 +49,10 @@ function runCmd(cmd, args){
             const currentTime = Date.now();
             if (currentTime - lastDataTime > timeoutDuration) {
                 if(lastLog.indexOf('Processing') >= 0 || lastLog.indexOf('Downloading') >= 0 || lastLog == ""){
-                    console.error('执行超时（35分钟无数据）：强制终止进程');
+                    console.error('执行超时（5分钟无数据）：强制终止进程');
                     ffmpegProcess.kill('SIGKILL'); // 强制终止进程
                 }else{
-                    console.error('35分钟无数据,继续等待,最后一次日志:' + lastLog);
+                    console.error('5分钟无数据,继续等待,最后一次日志:' + lastLog);
                 }
             } else {
                 setupTimeoutCheck(); // 重新设置检查
