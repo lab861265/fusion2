@@ -720,32 +720,8 @@ class Worker {
     this.taskData = data.data;
     const params = this.taskData.params || {};
 
-
-    
-    // 获取media_id和face_id
-    const mediaId = params.media_id || '';
-    const faceId = params.face_id || '';
-    
-    if (!mediaId || !faceId) {
-      console.log("Missing media_id or face_id in task");
-      return;
-    }
-    
-    // 获取媒体信息
-    const mediaData = await ApiClient.callApi("v1/get_media/" +  mediaId, {});
-    const faceData = await ApiClient.callApi("v1/get_media/" + faceId, {});
-    
-    if (mediaData.code !== 0 || faceData.code !== 0) {
-      console.log("Failed to fetch media or face data");
-      await ApiClient.addLog(this.taskData, true, -1, 'Failed to fetch media or face data', 99);
-      return;
-    }
-    
-    const mediaInfo = mediaData.data || {};
-    const faceInfo = faceData.data || {};
-    
-    const mediaFileUrl = mediaInfo.file_url || '';
-    const faceFileUrl = faceInfo.file_url || '';
+    const mediaFileUrl = params.media_url || '';
+    const faceFileUrl = params.face_url || '';
     
     if (!mediaFileUrl || !faceFileUrl) {
       console.log("Missing file URLs");
