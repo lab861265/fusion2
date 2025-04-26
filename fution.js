@@ -71,15 +71,16 @@ function runCmd(cmd, args){
 
         // stderr数据处理 - 带有进度更新的限制
         ffmpegProcess.stderr.on('data', async (data) => {
+            const lines = data.toString().split('\n');
+            if(lines.length <= 0)return;
+            let line = lines[0];
+            lastLog = lines[lines.length - 1];
             // 更新最后收到数据的时间
             const currentTime = Date.now();
             if(currentTime - lastUpdateTime < updateInterval){
                 return;
             }
-            const lines = data.toString().split('\n');
-            if(lines.length <= 0)return;
-            let line = lines[0];
-            lastLog = lines[lines.length - 1];
+           
             const match = line.match(/\[([^\]]+)\] Processing:\s+(\d+%)\|.*\|\s+(\d+\/\d+).*?([\d.]+)frame\/s/);
             if (!match) {return};
              const json = {
