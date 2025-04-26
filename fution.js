@@ -74,7 +74,10 @@ function runCmd(cmd, args){
             const lines = data.toString().split('\n');
             if(lines.length <= 0)return;
             let line = lines[0];
-            lastLog = lines[lines.length - 1];
+            lastLog = lines[lines.length - 1].trim();
+            if(lastLog.length <= 0 && lines.length > 1){
+              lastLog = lines[lines.length - 2].trim();
+            }
             // 更新最后收到数据的时间
             const currentTime = Date.now();
             if(currentTime - lastUpdateTime < updateInterval){
