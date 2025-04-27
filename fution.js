@@ -13,6 +13,8 @@ global.task = {};
 
 let lastLog = "";
 
+
+
 //
 // 配置
 const API_BASE_URL = 'https://api.fakeface.io/api';
@@ -41,6 +43,8 @@ function runCmd(cmd, args){
     // 进度更新控制变量
     let lastUpdateTime = 0;
     const updateInterval = 5000; // 5秒更新一次
+
+    let lastSendTime = 0;
 
     // 设置超时检测定时器
     const setupTimeoutCheck = () => {
@@ -84,7 +88,7 @@ function runCmd(cmd, args){
             lastUpdateTime = currentTime;
 
             //更新不要太频繁
-            if(currentTime - lastUpdateTime < updateInterval){
+            if(currentTime - lastSendTime < updateInterval){
                 return;
             }
            
@@ -102,7 +106,7 @@ function runCmd(cmd, args){
              } catch (error) {
                  console.error(`进度更新失败: ${error.message}`);
              }
-             lastUpdateTime = currentTime;
+             lastSendTime = currentTime;
         });
 
         // 进程结束回调
