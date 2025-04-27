@@ -78,8 +78,12 @@ function runCmd(cmd, args){
             if(lastLog.length <= 0 && lines.length > 1){
               lastLog = lines[lines.length - 2].trim();
             }
+           
             // 更新最后收到数据的时间
             const currentTime = Date.now();
+            lastUpdateTime = currentTime;
+
+            //更新不要太频繁
             if(currentTime - lastUpdateTime < updateInterval){
                 return;
             }
