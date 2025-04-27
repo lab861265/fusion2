@@ -48,7 +48,7 @@ function runCmd(cmd, args){
         timeoutTimer = setTimeout(() => {
             const currentTime = Date.now();
             if (currentTime - lastDataTime > timeoutDuration) {
-                if(lastLog.indexOf('Progress') >= 0 || lastLog.indexOf('Downloading') >= 0 || lastLog == ""){
+                if(lastLog.indexOf('Processing') >= 0 || lastLog.indexOf('Downloading') >= 0){
                     console.error('执行超时（5分钟无数据）：强制终止进程' + lastLog);
                     ffmpegProcess.kill('SIGKILL'); // 强制终止进程
                 }else{
