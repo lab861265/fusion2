@@ -75,6 +75,8 @@ function runCmd(cmd, args){
 
         // stderr数据处理 - 带有进度更新的限制
         ffmpegProcess.stderr.on('data', async (data) => {
+
+            lastDataTime = Date.now();
             const lines = data.toString().split('\n');
             if(lines.length <= 0)return;
             let line = lines[0];
