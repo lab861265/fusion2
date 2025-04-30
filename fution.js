@@ -385,11 +385,11 @@ class MediaProcessor {
     let drawTextFilter;
     if (resolution > 0) {
       drawTextFilter = `scale=trunc(iw*${targetHeight}/ih/2)*2:${targetHeight},` +
-                       `drawtext=text='ai':` +
+                       `drawtext=text='':` +
                        `x=w-tw-20:y=h-th-20:fontsize=h*0.03:` +
                        `fontcolor=white@0.3:shadowx=2:shadowy=2:shadowcolor=black@0.3`;
     } else {
-      drawTextFilter = `drawtext=text='ai':` +
+      drawTextFilter = `drawtext=text='':` +
                        `x=w-tw-20:y=h-th-20:fontsize=h*0.03:` +
                        `fontcolor=white@0.3:shadowx=2:shadowy=2:shadowcolor=black@0.3`;
     }
