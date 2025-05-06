@@ -777,7 +777,20 @@ class Worker {
       Utils.saveBase64Image(params.reference_face, './reface');
       MediaProcessor.addBorder('reface.png', 'reface.png');
     }
-
+    //webp2gif
+    if(extName == '.webp'){
+        if(Utils.isAnimatedWebP(inputFilename)){
+           const command = [
+               'convert',
+                inputFilename,
+               'input.gif',
+           ];
+           runCmdFast(command.join(' '));
+           inputFilename = 'input.gif';
+           mediaFilename = 'media.gif';
+           mediaExt = '.gif';
+        }
+    }
     // NSFW检查
     const nsfw = parseInt(params.checkMode || 0);
     if (nsfw === 1) {
