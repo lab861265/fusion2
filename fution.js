@@ -136,6 +136,12 @@ function runCmd(cmd, args){
 
 // 工具类
 class Utils {
+
+
+  static isAnimatedWebP(filePath) {
+      const buffer = fs.readFileSync(filePath);
+      return buffer.includes(Buffer.from('ANIM'));
+  }
   /**
    * 计算字符串的MD5哈希值
    * @param {string} inputString 
