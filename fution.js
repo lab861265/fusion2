@@ -750,8 +750,8 @@ class Worker {
     }
     
     // 下载文件
-    const mediaExt = path.extname(mediaFileUrl);
-    const faceExt = path.extname(faceFileUrl);
+    var mediaExt = path.extname(mediaFileUrl);
+    var faceExt = path.extname(faceFileUrl);
     var inputFilename = "input" + mediaExt;
     var mediaFilename = "media" + mediaExt;
     var faceFilename = "face" + faceExt;
@@ -761,7 +761,7 @@ class Worker {
     
     MediaProcessor.addBorder(faceFilename, faceFilename);
     
-    const extName = mediaExt.toLowerCase();
+    var extName = mediaExt.toLowerCase();
     
     // 解析参数
     const isEnhancement = parseInt(params.isEnhancement || 0);
@@ -789,6 +789,7 @@ class Worker {
            inputFilename = 'input.gif';
            mediaFilename = 'media.gif';
            mediaExt = '.gif';
+           extName = '.gif';
         }
     }
     // NSFW检查
