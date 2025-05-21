@@ -223,14 +223,19 @@ class Utils {
    * @param {string} signedUrl 
    * @returns {Promise<boolean>}
    */
-  static async uploadFileToS3(filePath, signedUrl) {
-    const fileContent = fs.readFileSync(filePath);
-    const fileSize = fs.statSync(filePath).size;
-    
-    const parsedUrl = new URL(signedUrl);
-    
+  static async uploadFileToS3(filePath, signedUrl, maxRetries = 3) {
+  const TIMEOUT_MS = 20 * 60 * 1000; // 20分钟超时
+  
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
-      console.log(`Uploading ${filePath} (${fileSize} bytes)...`);
+      console.log(`开始第 ${attempt} 次上传尝试...`);
+      
+      const fileContent = fs.readFileSync(filePath);
+      const fileSize = fs.statSync(filePath).size;
+      
+      const parsedUrl = new URL(signedUrl);
+      
+      console.log(`正在上传 ${filePath} (${fileSize} bytes)...`);
       
       const config = {
         method: 'PUT',
@@ -241,23 +246,39 @@ class Utils {
         },
         data: fileContent,
         maxContentLength: Infinity,
-        maxBodyLength: Infinity
+        maxBodyLength: Infinity,
+        timeout: TIMEOUT_MS, // 设置20分钟超时
+        validateStatus: (status) => {
+          return status >= 200 && status < 300; // 只有2xx状态码才算成功
+        }
       };
       
       const response = await axios(config);
       
-      if (response.status === 200) {
-        console.log("File uploaded successfully");
+      if (response.status === 200 || response.status === 204) {
+        console.log(`第 ${attempt} 次上传成功`);
         return true;
       } else {
-        console.log("File upload failed:", response.status, response.statusText);
+        throw new Error(`上传失败，状态码: ${response.status} ${response.statusText}`);
+      }
+      
+    } catch (error) {
+      console.error(`第 ${attempt} 次上传失败:`, error.message);
+      
+      // 如果是最后一次尝试，返回 false
+      if (attempt === maxRetries) {
+        console.error(`上传最终失败，已尝试 ${maxRetries} 次。最后错误: ${error.message}`);
         return false;
       }
-    } catch (error) {
-      console.error("Upload error:", error.message);
-      return false;
+      
+      // 等待一段时间后重试（递增延迟策略）
+      const delay = attempt * 2000; // 2秒，4秒，6秒...
+      console.log(`等待 ${delay / 1000} 秒后重试...`);
+      await new Promise(resolve => setTimeout(resolve, delay));
     }
   }
+  
+  return false; // 理论上不会到达这里，但为了安全起见
 }
 
 // API客户端类
