@@ -632,6 +632,7 @@ class MediaProcessor {
       '--execution-queue-count', '2',
       '--video-memory-strategy', 'tolerant',
       '--temp-frame-format', 'jpg',
+      '--output-video-fps', '24',
       '--output-video-quality', '70',
       '--output-video-preset', 'ultrafast',
       '--face-detector-score', '0.25'
