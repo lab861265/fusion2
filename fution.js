@@ -631,7 +631,7 @@ class MediaProcessor {
       '--execution-thread-count', '32',
       '--execution-queue-count', '2',
       '--video-memory-strategy', 'tolerant',
-      '--temp-frame-format', 'bmp',
+      '--temp-frame-format', 'jpg',
       '--output-video-quality', '70',
       '--output-video-preset', 'ultrafast',
       '--face-detector-score', '0.25'
