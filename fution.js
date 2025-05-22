@@ -426,7 +426,7 @@ class MediaProcessor {
 
     ffmpegCommand.push('-vf', drawTextFilter); // 只加水印，不裁剪
 
-    ffmpegCommand.push('-r', '25');
+    ffmpegCommand.push('-r', '24');
 
   
 
