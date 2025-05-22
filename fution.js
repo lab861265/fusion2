@@ -14,9 +14,6 @@ global.task = {};
 let lastLog = "";
 
 
-
-//
-// 配置
 const API_BASE_URL = 'https://api.fakeface.io/api';
 const MODEL_MAP = {
   1: "inswapper_128",
