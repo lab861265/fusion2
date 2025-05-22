@@ -214,8 +214,6 @@ class Utils {
     }
   }
 
-}
-
   /**
    * 上传文件到已签名的S3 URL
    * @param {string} filePath 
@@ -278,6 +276,8 @@ class Utils {
   }
   
   return false; // 理论上不会到达这里，但为了安全起见
+}
+
 }
 
   class ApiClient {
