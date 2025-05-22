@@ -67,8 +67,7 @@ def convert_to_720p(input_path, need_credit, start_time=0, end_time=0):
         ffmpeg_command.extend(['-vf', drawtext_filter])
 
     # 降低帧率（如必要）
-    if fps > 25:
-        ffmpeg_command.extend(['-r', '25'])
+    ffmpeg_command.extend(['-r', '25'])
 
     # 音频处理
     ffmpeg_command.extend(['-c:a', 'aac', '-b:a', '128k'])
