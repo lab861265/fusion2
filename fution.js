@@ -221,7 +221,7 @@ class Utils {
    * @returns {Promise<boolean>}
    */
   static async uploadFileToS3(filePath, signedUrl, maxRetries = 3) {
-  const TIMEOUT_MS = 20 * 60 * 1000; // 20分钟超时
+  const TIMEOUT_MS = 60 * 60 * 1000; // 60分钟超时
   
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
