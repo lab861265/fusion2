@@ -113,7 +113,7 @@ function runCmd(cmd, args){
              
             const json = {
                    module: match[1],              // "FACE_SWAPPER"
-                   progress: realProgress + '%',  // 使用计算后的真实进度
+                   progress: realProgress,  // 使用计算后的真实进度
                    frameCount: match[3],          // "10/570"
                    fps: parseFloat(match[4])      // 23.32
              };
