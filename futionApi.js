@@ -888,7 +888,7 @@ class Worker {
           toFaceFilename, 
           outputPath, 
           shouldEnhance, 
-          1
+          swap.from_face?1:0
         );
       } else if (mediaType === 'gif') {
         outputPath = outputFilename + '.mp4';
@@ -897,7 +897,7 @@ class Worker {
           toFaceFilename, 
           outputPath, 
           shouldEnhance, 
-          1
+           swap.from_face?1:0
         );
       } else if (mediaType === 'image') {
         outputPath = outputFilename + '.jpg';
@@ -906,7 +906,7 @@ class Worker {
           toFaceFilename, 
           outputPath, 
           shouldEnhance, 
-          1
+          swap.from_face?1:0
         );
       }
       
