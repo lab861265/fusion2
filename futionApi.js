@@ -858,14 +858,23 @@ class Worker {
       console.log(`开始第 ${swapIndex}/${swapList.length} 组人脸替换${shouldEnhance ? ' (含强化)' : ''}`);
       
       // 下载源人脸和目标人脸
-      const fromFaceFilename = `from_face_${swapIndex}.png`;
+      const fromFaceFilename = `reface.png`;
       const toFaceFilename = `to_face_${swapIndex}.png`;
+
+      try {
+        Utils.deleteFiles([
+          fromFaceFilename
+        ]);
+        console.log("Temporary files have been removed.");
+      } catch (e) {
+        console.error(`Error deleting files: ${e.message}`);
+      }
       
       await Utils.downloadFile(swap.from_face, fromFaceFilename);
       await Utils.downloadFile(swap.to_face, toFaceFilename);
       
       // 为人脸图像添加边框
-      MediaProcessor.addBorder(fromFaceFilename, fromFaceFilename);
+    //  MediaProcessor.addBorder(fromFaceFilename, fromFaceFilename);
       MediaProcessor.addBorder(toFaceFilename, toFaceFilename);
       
       // 设置输出文件名
@@ -879,7 +888,7 @@ class Worker {
           toFaceFilename, 
           outputPath, 
           shouldEnhance, 
-          0
+          1
         );
       } else if (mediaType === 'gif') {
         outputPath = outputFilename + '.mp4';
@@ -888,7 +897,7 @@ class Worker {
           toFaceFilename, 
           outputPath, 
           shouldEnhance, 
-          0
+          1
         );
       } else if (mediaType === 'image') {
         outputPath = outputFilename + '.jpg';
@@ -897,7 +906,7 @@ class Worker {
           toFaceFilename, 
           outputPath, 
           shouldEnhance, 
-          0
+          1
         );
       }
       
