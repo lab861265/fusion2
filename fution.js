@@ -1,13 +1,12 @@
 #!/usr/bin/env node
 
-const fs = require('fs');
-const path = require('path');
-const { execSync, spawn } = require('child_process');
-const { spawnSync } = require('child_process');
-const https = require('https');
-const crypto = require('crypto');
-const { URL } = require('url');
-const axios = require('axios');
+import fs from 'fs';
+import path from 'path';
+import { execSync, spawn, spawnSync } from 'child_process';
+import https from 'https';
+import crypto from 'crypto';
+import { URL } from 'url';
+import axios from 'axios';
 
 global.task = {};
 
