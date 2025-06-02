@@ -1,0 +1,18 @@
+{
+  "type": "module",
+  "dependencies": {
+    "axios": "^1.7.9",
+    "got": "^14.4.7",
+    "progress-stream": "^2.0.0"
+  },
+  "name": "test",
+  "version": "1.0.0",
+  "main": "a.js",
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}
