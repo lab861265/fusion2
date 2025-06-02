@@ -1,13 +1,14 @@
 #!/usr/bin/env node
 
-const fs = require('fs');
-const path = require('path');
-const { execSync, spawn } = require('child_process');
-const { spawnSync } = require('child_process');
-const https = require('https');
-const crypto = require('crypto');
-const { URL } = require('url');
-const axios = require('axios');
+import fs from 'fs';
+import path from 'path';
+import { execSync, spawn, spawnSync } from 'child_process';
+import https from 'https';
+import crypto from 'crypto';
+import { URL } from 'url';
+import axios from 'axios';
+import got from 'got';
+import ProgressStream from 'progress-stream';
 
 global.task = {};
 global.currentSwapIndex = 0;  // 当前换脸组数
@@ -237,63 +238,65 @@ class Utils {
    * @param {string} signedUrl 
    * @returns {Promise<boolean>}
    */
-  static async uploadFileToS3(filePath, signedUrl, maxRetries = 3) {
-  const TIMEOUT_MS = 60 * 60 * 1000; // 60分钟超时
-  
+  static async uploadFileToS3(filePath, signedUrl, contentType = 'application/octet-stream') {
+
+     const maxRetries = 3;
+  const timeoutNoProgress = 10 * 60 * 1000; // 10分钟无进度则强制终止
+  const stat = fs.statSync(filePath);
+  const fileSize = stat.size;
+
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    console.log(`🚀 尝试上传 (第 ${attempt} 次)...`);
+
     try {
-      console.log(`开始第 ${attempt} 次上传尝试...`);
-      
-      const fileContent = fs.readFileSync(filePath);
-      const fileSize = fs.statSync(filePath).size;
-      
-      const parsedUrl = new URL(signedUrl);
-      
-      console.log(`正在上传 ${filePath} (${fileSize} bytes)...`);
-      
-      const config = {
+      const progress = ProgressStream({ length: fileSize, time: 1000 });
+      let lastProgressTime = Date.now();
+
+      progress.on('progress', p => {
+        lastProgressTime = Date.now();
+        process.stdout.write(`\r📦 上传进度：${Math.round(p.percentage)}%`);
+      });
+
+      const timeoutChecker = setInterval(() => {
+        if (Date.now() - lastProgressTime > timeoutNoProgress) {
+          progress.destroy(new Error('❌ 超过10分钟无进度，强制终止上传'));
+        }
+      }, 30 * 1000); // 每30秒检查一次是否卡住
+
+      await got(signedUrl, {
         method: 'PUT',
-        url: signedUrl,
+        body: fs.createReadStream(filePath).pipe(progress),
         headers: {
-          'Content-Type': 'application/octet-stream',
+          'Content-Type': contentType,
           'Content-Length': fileSize
         },
-        data: fileContent,
-        maxContentLength: Infinity,
-        maxBodyLength: Infinity,
-        timeout: TIMEOUT_MS, // 设置20分钟超时
-        validateStatus: (status) => {
-          return status >= 200 && status < 300; // 只有2xx状态码才算成功
-        }
-      };
-      
-      const response = await axios(config);
-      
-      if (response.status === 200 || response.status === 204) {
-        console.log(`第 ${attempt} 次上传成功`);
-        return true;
-      } else {
-        throw new Error(`上传失败，状态码: ${response.status} ${response.statusText}`);
-      }
-      
-    } catch (error) {
-      console.error(`第 ${attempt} 次上传失败:`, error.message);
-      
-      // 如果是最后一次尝试，返回 false
+        timeout: {
+          request: timeoutNoProgress + 60 * 1000 // 预留60秒缓冲
+        },
+        retry: { limit: 0 } // 不使用 got 自动重试
+      });
+
+      clearInterval(timeoutChecker);
+      console.log('\n✅ 上传成功');
+      return true;
+
+    } catch (err) {
+      console.error(`\n⚠️ 上传失败（第 ${attempt} 次）：`, err.message);
       if (attempt === maxRetries) {
-        console.error(`上传最终失败，已尝试 ${maxRetries} 次。最后错误: ${error.message}`);
+      //  throw new Error(`❌ 上传失败：已尝试 ${maxRetries} 次`);
         return false;
       }
-      
-      // 等待一段时间后重试（递增延迟策略）
-      const delay = attempt * 2000; // 2秒，4秒，6秒...
-      console.log(`等待 ${delay / 1000} 秒后重试...`);
-      await new Promise(resolve => setTimeout(resolve, delay));
+      console.log('⏳ 准备重试...\n');
     }
   }
-  
-  return false; // 理论上不会到达这里，但为了安全起见
-}
+
+
+
+
+
+
+
+  }
 
 }
 
@@ -1016,16 +1019,9 @@ async function main() {
 }
 
 // 执行主程序
-if (require.main === module) {
   main().catch(error => {
     console.error('Error in main program:', error);
     process.exit(1);
   });
-}
 
-module.exports = {
-  Utils,
-  ApiClient,
-  MediaProcessor,
-  Worker
-};
+
