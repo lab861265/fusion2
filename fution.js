@@ -948,17 +948,10 @@ async function main() {
   await worker.work();
 }
 
-// 执行主程序
-if (require.main === module) {
+
   main().catch(error => {
     console.error('Error in main program:', error);
     process.exit(1);
   });
-}
 
-module.exports = {
-  Utils,
-  ApiClient,
-  MediaProcessor,
-  Worker
-};
+
