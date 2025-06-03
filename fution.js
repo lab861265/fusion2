@@ -865,6 +865,7 @@ class Worker {
       let apiRes = await ApiClient.callApi("v1/worker_task_set", {state:3, task_id:this.taskData._id, result:mediaData});
       
       console.log('Api result:', apiRes);
+      process.exit(1);
       return;
     } else if (extName === '.gif') {
       // 处理GIF文件
@@ -903,6 +904,7 @@ class Worker {
       };  
       console.log('mediaData:', mediaData);
       let apiRes = await ApiClient.callApi("v1/worker_task_set", {state:3, task_id:this.taskData._id, result:mediaData});
+      process.exit(1);
       return;
     } else if (['.jpg', '.webp', '.jpeg', '.png'].includes(extName)) {
       // 处理图像文件
@@ -937,7 +939,7 @@ class Worker {
       };
       console.log('mediaData:', mediaData);
       let apiRes = await ApiClient.callApi("v1/worker_task_set", {state:3, task_id:this.taskData._id, result:mediaData});
-
+      process.exit(1);
     }
   }
 }
