@@ -872,8 +872,9 @@ class Worker {
       } catch (e) {
         console.error(`Error deleting files: ${e.message}`);
       }
-      
-      await Utils.downloadFile(swap.from_face, fromFaceFilename);
+      if(swap.from_face){
+          await Utils.downloadFile(swap.from_face, fromFaceFilename);
+      }
       await Utils.downloadFile(swap.to_face, toFaceFilename);
       
       // 为人脸图像添加边框
