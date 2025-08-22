@@ -582,7 +582,21 @@ def work():
         out_file_path = 'media_out.jpg'
         real_out_file_path = 'media_out.jpg'
         add_watermark_to_image(media_filename);
-        proc_media(media_filename, face_filename, out_file_path, 1,need_credit)
+        # 图片处理 - 移除视频相关参数，直接运行
+        command = [
+            'python',
+            'run.py',
+            '-s', face_filename,
+            '-t', media_filename,
+            '-o', './' + out_file_path,
+            '--execution-providers', 'cuda',
+            '--headless',
+            '--face-selector-mode', 'many',
+            '--face-analyser-order', 'best-worst',
+            '--face-mask-types', 'occlusion',
+            '--frame-processors', 'face_swapper', 'face_enhancer'  # 图片必须强化
+        ]
+        subprocess.run(command)
         thumb_file_path = 'thumb_media.jpg'
         generate_img_thumbnail(out_file_path, thumb_file_path)
         if not os.path.exists(out_file_path):
